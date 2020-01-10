@@ -801,3 +801,31 @@ print.hdr <- function(object) {
   writeLines(as.character(c(object)))
   invisible(c(object))
   cat('\n'); }
+
+
+
+
+alphaparam <- function(alpha) {NULL};
+iterparams <- function(gradtol, steptol, iterlim) {NULL};
+
+checkIterArgs <- function(gradtol, steptol, iterlim) {
+  if (!is.numeric(gradtol)) { stop('Error: gradtol should be numeric') }
+  if (length(gradtol) != 1) { stop('Error: gradtol should be a single value'); }
+  if (gradtol <= 0)         { stop('Error: gradtol should be positive'); }
+  if (!is.numeric(steptol)) { stop('Error: steptol should be numeric') }
+  if (length(steptol) != 1) { stop('Error: steptol should be a single value'); }
+  if (steptol <= 0)         { stop('Error: steptol should be positive'); }
+  if (!is.numeric(iterlim)) { stop('Error: iterlim should be numeric') }
+  if (length(iterlim) != 1) { stop('Error: iterlim should be a single value'); }
+  if (iterlim <= 0)         { stop('Error: iterlim should be positive'); }
+}
+
+partial <- function(f, ...) {
+  args <- list(...);
+  args <- args[names(args) %in% names(formals(f))];
+
+  QQ <- function(L) { do.call("f", c(L, args)); }
+
+  QQ;}
+
+`%||%` <- function(l, r) {if (is.null(l)) r else l}
