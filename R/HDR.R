@@ -206,7 +206,8 @@ HDR.bimodal <- function(alpha, Q, f = NULL, u = NULL,
 
   HDR; }
 
-
+#' @examples
+#' HDR.norm(.05)
 HDR.norm <- function(alpha, mean = 0, sd = 1,
                      gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
