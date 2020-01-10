@@ -1,1 +1,7 @@
-exportPattern("^[[:alpha:]]+")
+exportPattern("^HDR[.](beta|cauchy|chiqsq|exp|f|gamma|lnorm|norm|t|unif|weibull|binom|geom|hyper|nbinom|pois)$")
+importFrom("stats", "dbeta", "dcauchy", "dexp", "df", "dgamma",
+           "dlnorm", "dnorm", "dt", "dunif", "dweibull", "nlm",
+           "pbinom", "pgeom", "phyper", "pnbinom", "ppois", "qbeta",
+           "qbinom", "qexp", "qf", "qgamma", "qgeom", "qhyper",
+           "qlnorm", "qnbinom", "qnorm", "qpois", "qt", "qunif",
+           "qweibull", "qcauchy", "dchisq", "qchisq")
