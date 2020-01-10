@@ -3,7 +3,7 @@ Type: Package
 Title: Add functions for distributions in the stats package
 Version: 0.1.0
 Date: 9 January 2020
-Authors@R: person("Ben", "O'Neill", email = "ben.oneill@hotmail.com", role = c("aut", "cre")),
+Authors@R: person("Ben", "O'Neill", email = "ben.oneill@hotmail.com", role = c("aut", "cre"))
            person("Neal", "Fultz", email = "nfultz@gmail.com", role = c("aut", "ctb"))
 Author: Ben O'Neill [aut, cre], Neal Fultz [aut, ctb],
 Maintainer: Neal Fultz <nfultz@gmail.com>
