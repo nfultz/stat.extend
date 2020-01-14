@@ -76,7 +76,7 @@ HDR.nbinom(alpha, size, prob = NULL, mu = NULL, gradtol = 1e-10,
 
 \item{iterlim}{Parameter for the nlm optimisation - a positive integer specifying the maximum number of iterations to be performed before the program is terminated (see [\code{nlm} doccumentation](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/nlm.html)).}
 
-\item{shape1, shape2, ncp, location, scale, df, rate, df1, df2, meanlog, sdlog, mean, sd, min, max, size, prob, n, n, k, mu, lambda}{Distribution parameters.}
+\item{shape1, shape2, ncp, location, scale, df, rate, df1, df2, meanlog, sdlog, mean, sd, min, max, shape, size, prob, m, n, k, mu, lambda}{Distribution parameters.}
 }
 \value{
 An interval object with classes \code{hdr} and \code{interval} containing the highest density region and related information.
