@@ -166,11 +166,6 @@ bimodal <- function(alpha, Q, f = NULL, u = NULL, ...,
 
 
 
-
-
-alphaparam <- function(alpha) {NULL};
-iterparams <- function(gradtol, steptol, iterlim) {NULL};
-
 checkIterArgs <- function(gradtol, steptol, iterlim) {
   if (!is.numeric(gradtol)) { stop('Error: gradtol should be numeric') }
   if (length(gradtol) != 1) { stop('Error: gradtol should be a single value'); }

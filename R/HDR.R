@@ -32,18 +32,22 @@
 #' The table above shows the parameters in each of the distributions.  Some have default values, but most need to be specified.  (For the gamma
 #' distribution you should specify either the \code{rate} or \code{scale} but not both.)
 #'
-#' @usage \code{HDR.xxxx(alpha, ... , gradtol = 1e-8, steptol = 1e-8, iterlim = 100)}
 #' @param alpha The significance level for the HDR (scalar between zero and one).  The probability coverage for the HDR is \code{1-alpha}.
-#' @param ... The user must input parameters from the chosen distribution to specify the distribution (see table above).
+#' @param shape1,shape2,ncp,location,scale,df,rate,df1,df2,meanlog,sdlog,mean,sd,min,max,size,prob,n,n,k,mu,lambda Distribution parameters.
 #' @param gradtol Parameter for the nlm optimisation - a positive scalar giving the tolerance at which the scaled gradient is considered close enough to zero to terminate the algorithm (see [\code{nlm} doccumentation](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/nlm.html)).
 #' @param steptol Parameter for the nlm optimisation - a positive scalar providing the minimum allowable relative step length (see [\code{nlm} doccumentation](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/nlm.html)).
 #' @param iterlim Parameter for the nlm optimisation - a positive integer specifying the maximum number of iterations to be performed before the program is terminated (see [\code{nlm} doccumentation](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/nlm.html)).
 #' @return An interval object with classes \code{hdr} and \code{interval} containing the highest density region and related information.
+#' @name HDR
+NULL
 
-
+#########################
+# Continous Distributions
+#########################
 
 #' @examples
 #' HDR.norm(.05)
+#' @rdname HDR
 HDR.norm <- function(alpha, mean = 0, sd = 1,
                      gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
@@ -64,7 +68,7 @@ HDR.norm <- function(alpha, mean = 0, sd = 1,
                mean = mean, sd = sd,
                gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
-
+#' @rdname HDR
 HDR.lnorm <- function(alpha, meanlog = 0, sdlog = 1,
                       gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
@@ -85,7 +89,7 @@ HDR.lnorm <- function(alpha, meanlog = 0, sdlog = 1,
            meanlog = meanlog, sdlog = sdlog,
            gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
-
+#' @rdname HDR
 HDR.t <- function(alpha, df, ncp = 0,
                   gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
@@ -108,6 +112,7 @@ HDR.t <- function(alpha, df, ncp = 0,
                gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
 
+#' @rdname HDR
 HDR.cauchy <- function(alpha, location = 0, scale = 1,
                        gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
@@ -129,6 +134,7 @@ HDR.cauchy <- function(alpha, location = 0, scale = 1,
            gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
 
+#' @rdname HDR
 HDR.f <- function(alpha, df1, df2, ncp = 0,
                   gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
@@ -166,6 +172,7 @@ HDR.f <- function(alpha, df1, df2, ncp = 0,
   HDR; }
 
 
+#' @rdname HDR
 HDR.beta <- function(alpha, shape1, shape2, ncp = 0,
                      gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
@@ -226,6 +233,7 @@ HDR.beta <- function(alpha, shape1, shape2, ncp = 0,
   HDR; }
 
 
+#' @rdname HDR
 HDR.chisq <- function(alpha, df, ncp = 0,
                       gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
@@ -259,6 +267,7 @@ HDR.chisq <- function(alpha, df, ncp = 0,
   HDR; }
 
 
+#' @rdname HDR
 HDR.gamma <- function(alpha, shape, rate = 1, scale = 1/rate,
                       gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
@@ -296,6 +305,7 @@ HDR.gamma <- function(alpha, shape, rate = 1, scale = 1/rate,
   HDR; }
 
 
+#' @rdname HDR
 HDR.weibull <- function(alpha, shape, scale = 1,
                         gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
@@ -328,6 +338,7 @@ HDR.weibull <- function(alpha, shape, scale = 1,
   HDR; }
 
 
+#' @rdname HDR
 HDR.exp <- function(alpha, rate,
                     gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
@@ -345,6 +356,7 @@ HDR.exp <- function(alpha, rate,
            decreasing = TRUE);}
 
 
+#' @rdname HDR
 HDR.unif <- function(alpha, min = 0, max = 1,
                      gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
@@ -366,40 +378,9 @@ HDR.unif <- function(alpha, min = 0, max = 1,
            gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
 
-discrete.unimodal <- function(alpha, Q, F, f = NULL, s = NULL, ...,
-                                  gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
-
-  #Check inputs
-  checkIterArgs();
-
-  Q <- partial(Q, ...);
-  if(is.function(f)) f <- partial(f, ...);
-  if(is.function(u)) u <- partial(u, ...);
 
 
-  #Compute the HDR
-
-  MIN <- Q(0);
-  MAX <- Q(alpha);
-  TT  <- F(MIN:MAX);
-  W   <- rep(NA, length(TT));
-  P   <- rep(NA, length(TT));
-  for (L in MIN:MAX) { LP     <- ifelse(L > MIN, F(L-1), 0);
-    U      <- Q(LP+1-alpha);
-    W[L-MIN+1] <- U-L+1;
-    P[L-MIN+1] <- F(U) - LP; }
-  for (i in 1:length(TT)) { if (W[i] != min(W)) P[i] <- 0; }
-
-  L   <- which.max(P)+MIN-1;
-  U   <- L+W[L-MIN+1]-1;
-  HDR <- structure(sets::integers(l = L, r = U),
-    probability = F(U) - ifelse(L > 0, F(L-1), 0),
-    method = paste0('Computed using discrete optimisation with minimum coverage probability = ',
-                    sprintf(100*(1-alpha), fmt = '%#.2f'), '%'))
-
-  HDR; }
-
-
+#' @rdname HDR
 HDR.hyper <- function(alpha, m, n, k,
                       gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
@@ -428,6 +409,7 @@ HDR.hyper <- function(alpha, m, n, k,
            gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
 
+#' @rdname HDR
 HDR.geom <- function(alpha, prob,
                      gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
@@ -449,6 +431,7 @@ HDR.geom <- function(alpha, prob,
                         gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
 
+#' @rdname HDR
 HDR.binom <- function(alpha, size, prob,
                       gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
@@ -474,6 +457,7 @@ HDR.binom <- function(alpha, size, prob,
                         gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
 
+#' @rdname HDR
 HDR.pois <- function(alpha, lambda,
                      gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
@@ -494,6 +478,7 @@ HDR.pois <- function(alpha, lambda,
                         gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
 
+#' @rdname HDR
 HDR.nbinom <- function(alpha, size, prob = NULL, mu = NULL,
                        gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
@@ -534,7 +519,7 @@ HDR.nbinom <- function(alpha, size, prob = NULL, mu = NULL,
            size = size, prob = prob, mu = mu,
            gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
-
+#' @export
 print.hdr <- function(x, ...) {
 
   #Print description of HDR
