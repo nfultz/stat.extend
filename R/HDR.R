@@ -41,7 +41,7 @@
 #' @return An interval object with classes \code{hdr} and \code{interval} containing the highest density region and related information.
 
 
-HDR.base <- function(alpha, modality, Q, distribution, ...) {
+hdr <- function(alpha, modality, Q, distribution, ...) {
   if (!is.numeric(alpha))   { stop('Error: alpha should be numeric') }
   if (length(alpha) != 1)   { stop('Error: alpha should be a single value'); }
   if (alpha < 0)            { stop('Error: alpha is negative'); }
@@ -61,10 +61,10 @@ HDR.base <- function(alpha, modality, Q, distribution, ...) {
   #Compute the HDR in non-trivial cases where 0 < alpha < 1
   if ((alpha > 0) && (alpha < 1)) {
     HDR <- switch(modality,
-                  monotone = HDR.monotone(alpha=alpha, Q=Q, ...),
-                  unimodal = HDR.unimodal(alpha=alpha, Q=Q, ...),
-                  bimodal  = HDR.bimodal(alpha=alpha, Q=Q, ...),
-                  discrete.unimodal = HDR.discrete.unimodal(alpha=alpha, Q=Q, ...)); }
+                  monotone = monotone(alpha=alpha, Q=Q, ...),
+                  unimodal = unimodal(alpha=alpha, Q=Q, ...),
+                  bimodal  = bimodal(alpha=alpha, Q=Q, ...),
+                  discrete.unimodal = discrete.unimodal(alpha=alpha, Q=Q, ...)); }
 
   HDR <- structure(HDR,
                    class = c('hdr','interval'),
@@ -75,7 +75,7 @@ HDR.base <- function(alpha, modality, Q, distribution, ...) {
 }
 
 
-HDR.monotone <- function(alpha, Q, decreasing = TRUE, ...) {
+monotone <- function(alpha, Q, decreasing = TRUE, ...) {
   Q <- partial(Q, ...);
 
   L <- if (decreasing) Q(0)       else Q(alpha);
@@ -87,7 +87,7 @@ HDR.monotone <- function(alpha, Q, decreasing = TRUE, ...) {
   HDR; }
 
 
-HDR.unimodal <- function(alpha, Q, f = NULL, u = NULL, ...,
+unimodal <- function(alpha, Q, f = NULL, u = NULL, ...,
                          gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
   #Check inputs
@@ -145,7 +145,7 @@ HDR.unimodal <- function(alpha, Q, f = NULL, u = NULL, ...,
   HDR; }
 
 
-HDR.bimodal <- function(alpha, Q, f = NULL, u = NULL, ...,
+bimodal <- function(alpha, Q, f = NULL, u = NULL, ...,
                         distribution = 'an unspecified input distribution',
                         gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
@@ -224,7 +224,7 @@ HDR.norm <- function(alpha, mean = 0, sd = 1,
                  paste0('normal distribution with mean = ', mean,
                         ' and standard deviation = ', sd));
 
-  HDR.base(alpha, "unimodal", Q = qnorm, f = dnorm, distribution = DIST,
+  hdr(alpha, "unimodal", Q = qnorm, f = dnorm, distribution = DIST,
                mean = mean, sd = sd,
                gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
@@ -245,7 +245,7 @@ HDR.lnorm <- function(alpha, meanlog = 0, sdlog = 1,
                  paste0('log-normal distribution with log-mean = ', meanlog,
                         ' and log-standard deviation = ', sdlog));
 
-  HDR.base(alpha, "unimodal", Q = qlnorm, f = dlnorm, distribution = DIST,
+  hdr(alpha, "unimodal", Q = qlnorm, f = dlnorm, distribution = DIST,
            meanlog = meanlog, sdlog = sdlog,
            gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
@@ -267,7 +267,7 @@ HDR.t <- function(alpha, df, ncp = 0,
                  paste0('Student\'s T distribution with ', df,
                         ' degrees-of-freedom and non-centrality parameter = ', ncp));
 
-  HDR.base(alpha, "unimodal", Q = qt, f = dt, distribution = DIST,
+  hdr(alpha, "unimodal", Q = qt, f = dt, distribution = DIST,
                df = df, ncp = ncp,
                gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
@@ -288,7 +288,7 @@ HDR.cauchy <- function(alpha, location = 0, scale = 1,
                  paste0('Cauchy distribution with location = ', location,
                         ' and scale = ', scale));
 
-  HDR.base(alpha, "unimodal", Q = qcauchy, f = dcauchy, distribution = DIST,
+  hdr(alpha, "unimodal", Q = qcauchy, f = dcauchy, distribution = DIST,
            location = location, scale = scale,
            gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
@@ -322,7 +322,7 @@ HDR.f <- function(alpha, df1, df2, ncp = 0,
 
   modality = ifelse(df1 <= 2, "monotone", "unimodal");
 
-  HDR <- HDR.base(alpha, modality, qf, df, distribution = "DIST",
+  HDR <- hdr(alpha, modality, qf, df, distribution = "DIST",
                   df1 = df1, df2 = df2, ncp = ncp,
                   decreasing = TRUE,
                   gradtol = gradtol, steptol = steptol, iterlim = iterlim);
@@ -365,34 +365,24 @@ HDR.beta <- function(alpha, shape1, shape2, ncp = 0,
     modality <- "monotone";
     decreasing <- "true";}
 
-    HDR <- HDR.monotone(alpha, Q = QQ, f = DD, distribution = DIST,
-                        decreasing = TRUE);
 
   #Compute HDR in monotone increasing case
   if ((shape1 >  1) && (shape2 <= 1)) {
     modality <- "monotone";}
 
-    HDR <- HDR.monotone(alpha, Q = QQ, f = DD, distribution = DIST,
-                        decreasing = FALSE);
-
   #Compute HDR in uniform case
   if ((shape1 == 1) && (shape2 == 1)) {
     modality <- "unimodal";}
 
-    HDR <- HDR.unimodal(alpha, Q = QQ, f = DD, distribution = DIST,
-                        gradtol = gradtol, steptol = steptol, iterlim = iterlim);
-
   #Compute HDR in unimodal case
   if ((shape1 > 1) && (shape2 > 1)) {
     modality <- "unimodal";}
-HDR <- HDR.unimodal(alpha, Q = QQ, f = DD, distribution = DIST,
-                        gradtol = gradtol, steptol = steptol, iterlim = iterlim);
 
   #Compute HDR in bimodal case
   if ((shape1 < 1) && (shape2 < 1)) {
     modality <- "bimodal";}
 
-  HDR <- HDR.base(alpha, modality, Q = qbeta, f = dbeta, distribution = DIST,
+  HDR <- hdr(alpha, modality, Q = qbeta, f = dbeta, distribution = DIST,
                   shape1 = shape1, shape2 = shape2, ncp = ncp,
                   decreasing = decreasing,
                   gradtol = gradtol, steptol = steptol, iterlim = iterlim);
@@ -426,7 +416,7 @@ HDR.chisq <- function(alpha, df, ncp = 0,
   if (df > 2) {
     modality <- "unimodal"; }
 
-  HDR <- HDR.base(alpha, modality, Q = qchisq, f = dchisq, distribution = DIST,
+  HDR <- hdr(alpha, modality, Q = qchisq, f = dchisq, distribution = DIST,
                   df = df, ncp = ncp,
                   gradtol = gradtol, steptol = steptol, iterlim = iterlim);
 
@@ -463,7 +453,7 @@ HDR.gamma <- function(alpha, shape, rate = 1, scale = 1/rate,
   #Compute HDR in unimodal case;
   if (shape > 1) { modality <- "unimodal"; }
 
-  HDR <- HDR.base(alpha, modality, Q = qgamma, f = dgamma, distribution = DIST,
+  HDR <- hdr(alpha, modality, Q = qgamma, f = dgamma, distribution = DIST,
                   shape = shape,  scale = scale,
                   gradtol = gradtol, steptol = steptol, iterlim = iterlim);
 
@@ -494,7 +484,7 @@ HDR.weibull <- function(alpha, shape, scale = 1,
   if (shape > 1) { modality <- "unimodal"; }
 
 
-  HDR <- HDR.base(alpha, Q = qweibull, f = dweibull, distribution = DIST,
+  HDR <- hdr(alpha, Q = qweibull, f = dweibull, distribution = DIST,
                       shape = shape, scale = scale,
                       decreasing = TRUE,
                       gradtol = gradtol, steptol = steptol, iterlim = iterlim);
@@ -514,7 +504,7 @@ HDR.exp <- function(alpha, rate,
   DIST <- paste0('exponential distribution with scale = ', 1/rate);
 
   #Compute the HDR
-  HDR.base(alpha, "monotone", Q = qexp, f = dexp, distribution = DIST,
+  hdr(alpha, "monotone", Q = qexp, f = dexp, distribution = DIST,
            rate = rate,
            decreasing = TRUE);}
 
@@ -535,12 +525,12 @@ HDR.unif <- function(alpha, min = 0, max = 1,
                  paste0('continuous uniform distribution with minimum = ', min,
                         ' and maximum = ', max));
 
-  HDR.base(alpha, "unimodal", Q = qunif, f = dunif, distribution = DIST,
+  hdr(alpha, "unimodal", Q = qunif, f = dunif, distribution = DIST,
            min = min, max = max,
            gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
 
-HDR.discrete.unimodal <- function(alpha, Q, F, f = NULL, s = NULL, ...,
+discrete.unimodal <- function(alpha, Q, F, f = NULL, s = NULL, ...,
                                   gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
   #Check inputs
@@ -597,7 +587,7 @@ HDR.hyper <- function(alpha, m, n, k,
   DIST <- paste0('hypergeometric distribution with ', m, ' white balls, ', n,
                  ' black balls, and ', k, ' balls drawn');
 
-  HDR.base(alpha, modality="discrete.unimodal", Q = qhyper, F = phyper, distribution = DIST,
+  hdr(alpha, modality="discrete.unimodal", Q = qhyper, F = phyper, distribution = DIST,
            m = m, n = n, k = k,
            gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
@@ -618,7 +608,7 @@ HDR.geom <- function(alpha, prob,
   #Set text for distribution
   DIST <- paste0('geometric distribution with probability = ', prob);
 
-  HDR.base(alpha, "discrete.unimodal", Q = qgeom, F = pgeom, distribution = DIST,
+  hdr(alpha, "discrete.unimodal", Q = qgeom, F = pgeom, distribution = DIST,
                         prob = prob,
                         gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
@@ -643,7 +633,7 @@ HDR.binom <- function(alpha, size, prob,
   DIST <- paste0('binomial distribution with size = ', size,
                  ' and probability = ', prob);
 
-  HDR.base(alpha, "discrete.unimodal", Q = qbinom, F = pbinom, distribution = DIST,
+  hdr(alpha, "discrete.unimodal", Q = qbinom, F = pbinom, distribution = DIST,
            size = size, prob = prob,
                         gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
@@ -663,7 +653,7 @@ HDR.pois <- function(alpha, lambda,
   #Set text for distribution
   DIST <- paste0('Poisson distribution with rate = ', lambda);
 
-  HDR.base(alpha, "discrete.unimodal", Q = qpois, F = ppois, distribution = DIST,
+  hdr(alpha, "discrete.unimodal", Q = qpois, F = ppois, distribution = DIST,
                         lambda = lambda,
                         gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
@@ -704,7 +694,7 @@ HDR.nbinom <- function(alpha, size, prob = NULL, mu = NULL,
                  paste0('negative binomial distribution with size = ',
                         size, ' and mean = ', mu));
 
-  HDR.base(alpha, "discrete.unimodal", Q = qnbinom, F = pbinom, distribution = DIST,
+  hdr(alpha, "discrete.unimodal", Q = qnbinom, F = pbinom, distribution = DIST,
            size = size, prob = prob, mu = mu,
            gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
