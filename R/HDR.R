@@ -64,7 +64,7 @@ HDR.norm <- function(alpha, mean = 0, sd = 1,
                  paste0('normal distribution with mean = ', mean,
                         ' and standard deviation = ', sd));
 
-  hdr(alpha, "unimodal", Q = qnorm, f = dnorm, distribution = DIST,
+  hdr(alpha, unimodal, Q = qnorm, f = dnorm, distribution = DIST,
                mean = mean, sd = sd,
                gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
@@ -85,7 +85,7 @@ HDR.lnorm <- function(alpha, meanlog = 0, sdlog = 1,
                  paste0('log-normal distribution with log-mean = ', meanlog,
                         ' and log-standard deviation = ', sdlog));
 
-  hdr(alpha, "unimodal", Q = qlnorm, f = dlnorm, distribution = DIST,
+  hdr(alpha, unimodal, Q = qlnorm, f = dlnorm, distribution = DIST,
            meanlog = meanlog, sdlog = sdlog,
            gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
@@ -107,7 +107,7 @@ HDR.t <- function(alpha, df, ncp = 0,
                  paste0('Student\'s T distribution with ', df,
                         ' degrees-of-freedom and non-centrality parameter = ', ncp));
 
-  hdr(alpha, "unimodal", Q = qt, f = dt, distribution = DIST,
+  hdr(alpha, unimodal, Q = qt, f = dt, distribution = DIST,
                df = df, ncp = ncp,
                gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
@@ -129,7 +129,7 @@ HDR.cauchy <- function(alpha, location = 0, scale = 1,
                  paste0('Cauchy distribution with location = ', location,
                         ' and scale = ', scale));
 
-  hdr(alpha, "unimodal", Q = qcauchy, f = dcauchy, distribution = DIST,
+  hdr(alpha, unimodal, Q = qcauchy, f = dcauchy, distribution = DIST,
            location = location, scale = scale,
            gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
@@ -162,7 +162,7 @@ HDR.f <- function(alpha, df1, df2, ncp = 0,
                         ' numerator degrees-of-freedom and ', df2,
                         ' denominator degrees-of-freedom and non-centrality parameter = ', ncp));
 
-  modality = ifelse(df1 <= 2, "monotone", "unimodal");
+  modality <- if(df1 <= 2) monotone else unimodal;
 
   HDR <- hdr(alpha, modality, qf, df, distribution = DIST,
                   df1 = df1, df2 = df2, ncp = ncp,
@@ -205,25 +205,25 @@ HDR.beta <- function(alpha, shape1, shape2, ncp = 0,
 
   #Compute HDR in monotone decreasing case
   if ((shape1 <= 1) && (shape2 >  1)) {
-    modality <- "monotone";
+    modality <- monotone;
     decreasing <- TRUE;}
 
 
   #Compute HDR in monotone increasing case
   if ((shape1 >  1) && (shape2 <= 1)) {
-    modality <- "monotone";}
+    modality <- monotone;}
 
   #Compute HDR in uniform case
   if ((shape1 == 1) && (shape2 == 1)) {
-    modality <- "unimodal";}
+    modality <- unimodal;}
 
   #Compute HDR in unimodal case
   if ((shape1 > 1) && (shape2 > 1)) {
-    modality <- "unimodal";}
+    modality <- unimodal;}
 
   #Compute HDR in bimodal case
   if ((shape1 < 1) && (shape2 < 1)) {
-    modality <- "bimodal";}
+    modality <- bimodal;}
 
   HDR <- hdr(alpha, modality, Q = qbeta, f = dbeta, distribution = DIST,
                   shape1 = shape1, shape2 = shape2, ncp = ncp,
@@ -254,11 +254,11 @@ HDR.chisq <- function(alpha, df, ncp = 0,
 
   #Compute HDR in monotone case;
   if (df <= 2) {
-    modality = "monotone"; }
+    modality = monotone; }
 
   #Compute HDR in unimodal case;
   if (df > 2) {
-    modality <- "unimodal"; }
+    modality <- unimodal; }
 
   HDR <- hdr(alpha, modality, Q = qchisq, f = dchisq, distribution = DIST,
                   df = df, ncp = ncp,
@@ -293,10 +293,10 @@ HDR.gamma <- function(alpha, shape, rate = 1, scale = 1/rate,
                         ' and scale = ', scale));
 
   #Compute HDR in monotone case;
-  if (shape <= 1) { modality <- "monotone"; }
+  if (shape <= 1) { modality <- monotone; }
 
   #Compute HDR in unimodal case;
-  if (shape > 1) { modality <- "unimodal"; }
+  if (shape > 1) { modality <- unimodal; }
 
   HDR <- hdr(alpha, modality, Q = qgamma, f = dgamma, distribution = DIST,
                   shape = shape,  scale = scale,
@@ -324,10 +324,10 @@ HDR.weibull <- function(alpha, shape, scale = 1,
                         ' and scale = ', scale));
 
   #Compute HDR in monotone case;
-  if (shape <= 1) { modality <- "monotone"; }
+  if (shape <= 1) { modality <- monotone; }
 
   #Compute HDR in unimodal case;
-  if (shape > 1) { modality <- "unimodal"; }
+  if (shape > 1) { modality <- unimodal; }
 
 
   HDR <- hdr(alpha, modality, Q = qweibull, f = dweibull, distribution = DIST,
@@ -351,7 +351,7 @@ HDR.exp <- function(alpha, rate,
   DIST <- paste0('exponential distribution with scale = ', 1/rate);
 
   #Compute the HDR
-  hdr(alpha, "monotone", Q = qexp, f = dexp, distribution = DIST,
+  hdr(alpha, monotone, Q = qexp, f = dexp, distribution = DIST,
            rate = rate,
            decreasing = TRUE);}
 
@@ -373,7 +373,7 @@ HDR.unif <- function(alpha, min = 0, max = 1,
                  paste0('continuous uniform distribution with minimum = ', min,
                         ' and maximum = ', max));
 
-  hdr(alpha, "unimodal", Q = qunif, f = dunif, distribution = DIST,
+  hdr(alpha, unimodal, Q = qunif, f = dunif, distribution = DIST,
            min = min, max = max,
            gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
@@ -404,7 +404,7 @@ HDR.hyper <- function(alpha, m, n, k,
   DIST <- paste0('hypergeometric distribution with ', m, ' white balls, ', n,
                  ' black balls, and ', k, ' balls drawn');
 
-  hdr(alpha, modality="discrete.unimodal", Q = qhyper, F = phyper, distribution = DIST,
+  hdr(alpha, modality=discrete.unimodal, Q = qhyper, F = phyper, distribution = DIST,
            m = m, n = n, k = k,
            gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
@@ -426,7 +426,7 @@ HDR.geom <- function(alpha, prob,
   #Set text for distribution
   DIST <- paste0('geometric distribution with probability = ', prob);
 
-  hdr(alpha, "discrete.unimodal", Q = qgeom, F = pgeom, distribution = DIST,
+  hdr(alpha, discrete.unimodal, Q = qgeom, F = pgeom, distribution = DIST,
                         prob = prob,
                         gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
@@ -452,7 +452,7 @@ HDR.binom <- function(alpha, size, prob,
   DIST <- paste0('binomial distribution with size = ', size,
                  ' and probability = ', prob);
 
-  hdr(alpha, "discrete.unimodal", Q = qbinom, F = pbinom, distribution = DIST,
+  hdr(alpha, discrete.unimodal, Q = qbinom, F = pbinom, distribution = DIST,
            size = size, prob = prob,
                         gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
@@ -473,7 +473,7 @@ HDR.pois <- function(alpha, lambda,
   #Set text for distribution
   DIST <- paste0('Poisson distribution with rate = ', lambda);
 
-  hdr(alpha, "discrete.unimodal", Q = qpois, F = ppois, distribution = DIST,
+  hdr(alpha, discrete.unimodal, Q = qpois, F = ppois, distribution = DIST,
                         lambda = lambda,
                         gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
@@ -517,7 +517,7 @@ HDR.nbinom <- function(alpha, size, prob, mu,
                         size, ' and mean = ', mu));
 
 
-  hdr(alpha, "discrete.unimodal", 
+  hdr(alpha, discrete.unimodal, 
            #Q = qnbinom, F = pbinom, 
            Q = QQ, F = FF, 
            distribution = DIST,

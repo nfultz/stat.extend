@@ -18,11 +18,7 @@ hdr <- function(alpha, modality, Q, distribution, ...) {
 
   #Compute the HDR in non-trivial cases where 0 < alpha < 1
   if ((alpha > 0) && (alpha < 1)) {
-    HDR <- switch(modality,
-                  monotone = monotone(alpha=alpha, Q=Q, ...),
-                  unimodal = unimodal(alpha=alpha, Q=Q, ...),
-                  bimodal  = bimodal(alpha=alpha, Q=Q, ...),
-                  discrete.unimodal = discrete.unimodal(alpha=alpha, Q=Q, ...)); }
+    HDR <- modality(alpha=alpha, Q=Q, ...);}
 
   HDR <- structure(HDR,
                    class = c('hdr','interval'),
