@@ -64,6 +64,13 @@ stopifnot(all.equal(
                                                                               "interval"), domain = "R", method = "Computed using nlm optimisation with 0 iterations (code = 1)", probability = 0.95, distribution = "standard uniform distribution")  
 ))
 
+# unimodal
+stopifnot(all.equal(
+stat.extend::HDR.beta(.05, 2, 2),
+structure(list(list(l = 0.0942993240502461, r = 0.905700675949753, 
+                    lc = TRUE, rc = TRUE)), class = c("hdr", "interval"), domain = "R", method = "Computed using nlm optimisation with 0 iterations (code = 1)", probability = 0.95, distribution = "beta distribution with shape1 = 2 and shape2 = 2")
+))
+
 # bimodal
 stopifnot(all.equal(
   stat.extend::HDR.beta(.05, .1, .1),
@@ -164,6 +171,13 @@ stopifnot(all.equal(
   stat.extend::HDR.nbinom(.05, 10, .20),
   structure(list(list(l = 15, r = 68, lc = TRUE, rc = TRUE)), class = c("hdr", 
                                                                         "interval"), domain = "Z", probability = 0.951352378174766, method = "Computed using discrete optimisation with minimum coverage probability = 95.00%", distribution = "negative binomial distribution with size = 10 and probability = 0.2")
+))
+
+# nbinom "mu mode"
+stopifnot(all.equal(
+  stat.extend::HDR.nbinom(.05, 4, mu=3),
+  structure(list(list(l = 0, r = 7, lc = TRUE, rc = TRUE)), class = c("hdr", 
+                                                                    "interval"), domain = "Z", probability = 0.95479730230908, method = "Computed using discrete optimisation with minimum coverage probability = 95.00%", distribution = "negative binomial distribution with size = 4 and mean = 3")
 ))
 
 # short circuit when alpha = 1

@@ -149,9 +149,6 @@ HDR.f <- function(alpha, df1, df2, ncp = 0,
   if (length(ncp) != 1)     { stop('Error: ncp should be a single value'); }
   if (ncp < 0)              { stop('Error: ncp is negative'); }
 
-  #Simplify probability functions (with stipulated parameters)
-  QQ <- function(L) { qf(L, df1, df2, ncp); }
-  DD <- function(L) { df(L, df1, df2, ncp); }
 
   #Set text for distribution
   DIST <- ifelse(ncp == 0,
@@ -186,10 +183,6 @@ HDR.beta <- function(alpha, shape1, shape2, ncp = 0,
   if (!is.numeric(ncp))     { stop('Error: ncp should be numeric') }
   if (length(ncp) != 1)     { stop('Error: ncp should be a single value'); }
   if (ncp < 0)              { stop('Error: ncp is negative'); }
-
-  #Simplify probability functions (with stipulated parameters)
-  QQ <- function(L) { qbeta(L, shape1, shape2, ncp); }
-  DD <- function(L) { dbeta(L, shape1, shape2, ncp); }
 
   #Set text for distribution
   DIST <- ifelse(ncp == 0,
@@ -396,9 +389,6 @@ HDR.hyper <- function(alpha, m, n, k,
   if (k < 1)           { stop('Error: k should be at least one'); }
   if (k > n + m)       { stop('Error: k is greater than n + m'); }
 
-  #Simplify probability functions (with stipulated parameters)
-  QQ <- function(L) { qhyper(L, m, n, k); }
-  FF <- function(L) { phyper(L, m, n, k); }
 
   #Set text for distribution
   DIST <- paste0('hypergeometric distribution with ', m, ' white balls, ', n,
@@ -419,9 +409,6 @@ HDR.geom <- function(alpha, prob,
   if (prob < 0)           { stop('Error: prob should be between zero and one'); }
   if (prob > 1)           { stop('Error: prob should be between zero and one'); }
 
-  #Simplify probability functions (with stipulated parameters)
-  QQ <- function(L) { qgeom(L, prob); }
-  FF <- function(L) { pgeom(L, prob); }
 
   #Set text for distribution
   DIST <- paste0('geometric distribution with probability = ', prob);
@@ -444,10 +431,6 @@ HDR.binom <- function(alpha, size, prob,
   if (prob < 0)           { stop('Error: prob should be between zero and one'); }
   if (prob > 1)           { stop('Error: prob should be between zero and one'); }
 
-  #Simplify probability functions (with stipulated parameters)
-  QQ <- function(L) { qbinom(L, size, prob); }
-  FF <- function(L) { pbinom(L, size, prob); }
-
   #Set text for distribution
   DIST <- paste0('binomial distribution with size = ', size,
                  ' and probability = ', prob);
@@ -465,10 +448,6 @@ HDR.pois <- function(alpha, lambda,
   if (!is.numeric(lambda)) { stop('Error: lambda should be numeric') }
   if (length(lambda) != 1) { stop('Error: lambda should be a single value'); }
   if (lambda < 0)          { stop('Error: lambda is negative'); }
-
-  #Simplify probability functions (with stipulated parameters)
-  QQ <- function(L) { qpois(L, lambda); }
-  FF <- function(L) { ppois(L, lambda); }
 
   #Set text for distribution
   DIST <- paste0('Poisson distribution with rate = ', lambda);
