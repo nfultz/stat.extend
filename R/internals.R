@@ -26,14 +26,14 @@ hdr <- function(alpha, modality, Q, distribution, ...) {
 
   HDR <- structure(HDR,
                    class = c('hdr','interval'),
-                   probability = 1 - alpha,
+                   probability = attr(HDR, "probability") %||% (1 - alpha),
                    distribution = distribution);
 
   HDR;
 }
 
 
-monotone <- function(alpha, Q, decreasing = TRUE, ...) {
+monotone <- function(alpha, Q, f=NULL, decreasing = TRUE, ...) {
   Q <- partial(Q, ...);
 
   L <- if (decreasing) Q(0)       else Q(alpha);
@@ -178,11 +178,11 @@ checkIterArgs <- function(gradtol, steptol, iterlim) {
   if (iterlim <= 0)         { stop('Error: iterlim should be positive'); }
 }
 
-partial <- function(f, ...) {
+partial <- function(FUN, ...) {
   args <- list(...);
-  args <- args[names(args) %in% names(formals(f))];
+  args <- args[names(args) %in% names(formals(FUN))];
 
-  QQ <- function(L) { do.call("f", c(L, args)); }
+  QQ <- function(L) { do.call("FUN", c(list(L), args)); }
 
   QQ;}
 
@@ -194,11 +194,10 @@ discrete.unimodal <- function(alpha, Q, F, f = NULL, s = NULL, ...,
                               gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
   #Check inputs
-  checkIterArgs();
+  checkIterArgs(gradtol, steptol, iterlim);
 
   Q <- partial(Q, ...);
-  if(is.function(f)) f <- partial(f, ...);
-  if(is.function(u)) u <- partial(u, ...);
+  if(is.function(F)) F <- partial(F, ...);
 
 
   #Compute the HDR

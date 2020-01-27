@@ -20,52 +20,104 @@
 \alias{HDR.nbinom}
 \title{Highest density region (HDR)}
 \usage{
-HDR.norm(alpha, mean = 0, sd = 1, gradtol = 1e-10, steptol = 1e-10,
-  iterlim = 100)
+HDR.norm(
+  alpha,
+  mean = 0,
+  sd = 1,
+  gradtol = 1e-10,
+  steptol = 1e-10,
+  iterlim = 100
+)
 
-HDR.lnorm(alpha, meanlog = 0, sdlog = 1, gradtol = 1e-10,
-  steptol = 1e-10, iterlim = 100)
+HDR.lnorm(
+  alpha,
+  meanlog = 0,
+  sdlog = 1,
+  gradtol = 1e-10,
+  steptol = 1e-10,
+  iterlim = 100
+)
 
-HDR.t(alpha, df, ncp = 0, gradtol = 1e-10, steptol = 1e-10,
-  iterlim = 100)
+HDR.t(alpha, df, ncp = 0, gradtol = 1e-10, steptol = 1e-10, iterlim = 100)
 
-HDR.cauchy(alpha, location = 0, scale = 1, gradtol = 1e-10,
-  steptol = 1e-10, iterlim = 100)
+HDR.cauchy(
+  alpha,
+  location = 0,
+  scale = 1,
+  gradtol = 1e-10,
+  steptol = 1e-10,
+  iterlim = 100
+)
 
-HDR.f(alpha, df1, df2, ncp = 0, gradtol = 1e-10, steptol = 1e-10,
-  iterlim = 100)
+HDR.f(
+  alpha,
+  df1,
+  df2,
+  ncp = 0,
+  gradtol = 1e-10,
+  steptol = 1e-10,
+  iterlim = 100
+)
 
-HDR.beta(alpha, shape1, shape2, ncp = 0, gradtol = 1e-10,
-  steptol = 1e-10, iterlim = 100)
+HDR.beta(
+  alpha,
+  shape1,
+  shape2,
+  ncp = 0,
+  gradtol = 1e-10,
+  steptol = 1e-10,
+  iterlim = 100
+)
 
-HDR.chisq(alpha, df, ncp = 0, gradtol = 1e-10, steptol = 1e-10,
-  iterlim = 100)
+HDR.chisq(alpha, df, ncp = 0, gradtol = 1e-10, steptol = 1e-10, iterlim = 100)
 
-HDR.gamma(alpha, shape, rate = 1, scale = 1/rate, gradtol = 1e-10,
-  steptol = 1e-10, iterlim = 100)
+HDR.gamma(
+  alpha,
+  shape,
+  rate = 1,
+  scale = 1/rate,
+  gradtol = 1e-10,
+  steptol = 1e-10,
+  iterlim = 100
+)
 
-HDR.weibull(alpha, shape, scale = 1, gradtol = 1e-10,
-  steptol = 1e-10, iterlim = 100)
+HDR.weibull(
+  alpha,
+  shape,
+  scale = 1,
+  gradtol = 1e-10,
+  steptol = 1e-10,
+  iterlim = 100
+)
 
 HDR.exp(alpha, rate, gradtol = 1e-10, steptol = 1e-10, iterlim = 100)
 
-HDR.unif(alpha, min = 0, max = 1, gradtol = 1e-10, steptol = 1e-10,
-  iterlim = 100)
+HDR.unif(
+  alpha,
+  min = 0,
+  max = 1,
+  gradtol = 1e-10,
+  steptol = 1e-10,
+  iterlim = 100
+)
 
-HDR.hyper(alpha, m, n, k, gradtol = 1e-10, steptol = 1e-10,
-  iterlim = 100)
+HDR.hyper(alpha, m, n, k, gradtol = 1e-10, steptol = 1e-10, iterlim = 100)
 
-HDR.geom(alpha, prob, gradtol = 1e-10, steptol = 1e-10,
-  iterlim = 100)
+HDR.geom(alpha, prob, gradtol = 1e-10, steptol = 1e-10, iterlim = 100)
 
-HDR.binom(alpha, size, prob, gradtol = 1e-10, steptol = 1e-10,
-  iterlim = 100)
+HDR.binom(alpha, size, prob, gradtol = 1e-10, steptol = 1e-10, iterlim = 100)
 
-HDR.pois(alpha, lambda, gradtol = 1e-10, steptol = 1e-10,
-  iterlim = 100)
+HDR.pois(alpha, lambda, gradtol = 1e-10, steptol = 1e-10, iterlim = 100)
 
-HDR.nbinom(alpha, size, prob = NULL, mu = NULL, gradtol = 1e-10,
-  steptol = 1e-10, iterlim = 100)
+HDR.nbinom(
+  alpha,
+  size,
+  prob,
+  mu,
+  gradtol = 1e-10,
+  steptol = 1e-10,
+  iterlim = 100
+)
 }
 \arguments{
 \item{alpha}{The significance level for the HDR (scalar between zero and one).  The probability coverage for the HDR is \code{1-alpha}.}

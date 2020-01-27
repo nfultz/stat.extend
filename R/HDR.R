@@ -164,7 +164,7 @@ HDR.f <- function(alpha, df1, df2, ncp = 0,
 
   modality = ifelse(df1 <= 2, "monotone", "unimodal");
 
-  HDR <- hdr(alpha, modality, qf, df, distribution = "DIST",
+  HDR <- hdr(alpha, modality, qf, df, distribution = DIST,
                   df1 = df1, df2 = df2, ncp = ncp,
                   decreasing = TRUE,
                   gradtol = gradtol, steptol = steptol, iterlim = iterlim);
@@ -206,7 +206,7 @@ HDR.beta <- function(alpha, shape1, shape2, ncp = 0,
   #Compute HDR in monotone decreasing case
   if ((shape1 <= 1) && (shape2 >  1)) {
     modality <- "monotone";
-    decreasing <- "true";}
+    decreasing <- TRUE;}
 
 
   #Compute HDR in monotone increasing case
@@ -330,7 +330,7 @@ HDR.weibull <- function(alpha, shape, scale = 1,
   if (shape > 1) { modality <- "unimodal"; }
 
 
-  HDR <- hdr(alpha, Q = qweibull, f = dweibull, distribution = DIST,
+  HDR <- hdr(alpha, modality, Q = qweibull, f = dweibull, distribution = DIST,
                       shape = shape, scale = scale,
                       decreasing = TRUE,
                       gradtol = gradtol, steptol = steptol, iterlim = iterlim);
@@ -479,7 +479,7 @@ HDR.pois <- function(alpha, lambda,
 
 
 #' @rdname HDR
-HDR.nbinom <- function(alpha, size, prob = NULL, mu = NULL,
+HDR.nbinom <- function(alpha, size, prob, mu,
                        gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
   #Check inputs
@@ -501,12 +501,13 @@ HDR.nbinom <- function(alpha, size, prob = NULL, mu = NULL,
     if (mu < 0)            { stop('Error: mu is negative'); }}
 
   #Simplify probability functions (with stipulated parameters)
+  # NOTE we are doing this here because p/qnbinom require mu to be *missing* (not NULL)
   if (!(missing(prob)))  {
-    QQ <- function(L) { qnbinom(L, size, prob = prob); }
-    FF <- function(L) { pnbinom(L, size, prob = prob); } }
+    QQ <- function(L, ...) { qnbinom(L, size, prob = prob); }
+    FF <- function(L, ...) { pnbinom(L, size, prob = prob); } }
   if (missing(prob)   )  {
-    QQ <- function(L) { qnbinom(L, size, mu = mu); }
-    FF <- function(L) { pnbinom(L, size, mu = mu); } }
+    QQ <- function(L, ...) { qnbinom(L, size, mu = mu); }
+    FF <- function(L, ...) { pnbinom(L, size, mu = mu); } }
 
   #Set text for distribution
   DIST <- ifelse(!missing(prob),
@@ -515,8 +516,12 @@ HDR.nbinom <- function(alpha, size, prob = NULL, mu = NULL,
                  paste0('negative binomial distribution with size = ',
                         size, ' and mean = ', mu));
 
-  hdr(alpha, "discrete.unimodal", Q = qnbinom, F = pbinom, distribution = DIST,
-           size = size, prob = prob, mu = mu,
+
+  hdr(alpha, "discrete.unimodal", 
+           #Q = qnbinom, F = pbinom, 
+           Q = QQ, F = FF, 
+           distribution = DIST,
+           #size = size, prob = prob, mu = mu,
            gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
 #' @export
