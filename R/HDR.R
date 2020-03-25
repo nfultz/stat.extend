@@ -32,7 +32,7 @@
 #' The table above shows the parameters in each of the distributions.  Some have default values, but most need to be specified.  (For the gamma
 #' distribution you should specify either the \code{rate} or \code{scale} but not both.)
 #'
-#' @param (1-cover.prob) The significance level for the HDR (scalar between zero and one).  The probability coverage for the HDR is \code{1-(1-cover.prob)}.
+#' @param cover.prob The probability coverage for the HDR (scalar between zero and one).  The significance level for the HDR i is \code{1-cover.prob}.  
 #' @param shape1,shape2,ncp,location,scale,df,rate,df1,df2,meanlog,sdlog,mean,sd,min,max,shape,size,prob,m,n,k,mu,lambda Distribution parameters.
 #' @param gradtol Parameter for the nlm optimisation - a positive scalar giving the tolerance at which the scaled gradient is considered close enough to zero to terminate the algorithm (see [\code{nlm} doccumentation](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/nlm.html)).
 #' @param steptol Parameter for the nlm optimisation - a positive scalar providing the minimum allowable relative step length (see [\code{nlm} doccumentation](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/nlm.html)).
