@@ -1,19 +1,19 @@
 
 hdr <- function(cover.prob, modality, Q, distribution, ...) {
-  if (!is.numeric((1-cover.prob)))   { stop('Error: (1-cover.prob) should be numeric') }
-  if (length((1-cover.prob)) != 1)   { stop('Error: (1-cover.prob) should be a single value'); }
-  if ((1-cover.prob) < 0)            { stop('Error: (1-cover.prob) is negative'); }
-  if ((1-cover.prob) > 1)            { stop('Error: (1-cover.prob) is greater than one'); }
+  if (!is.numeric(cover.prob))   { stop('Error: cover.prob should be numeric') }
+  if (length(cover.prob) != 1)   { stop('Error: cover.prob should be a single value'); }
+  if (cover.prob < 0)            { stop('Error: cover.prob is negative'); }
+  if (cover.prob > 1)            { stop('Error: cover.prob is greater than one'); }
 
-  #Compute the HDR in trivial cases where (1-cover.prob) is 0 or 1
-  #When (1-cover.prob) = 0 the HDR is the support of the distribution
-  if ((1-cover.prob) == 0) {
+  #Compute the HDR in trivial cases where cover.prob is 0 or 1
+  #When cover.prob = 1 the HDR is the support of the distribution
+  if (cover.prob == 1) {
     Q <- partial(Q, ...);
     HDR <- structure(sets::interval(l = Q(0), r = Q(1), bounds = 'closed'),
                      method = NA_character_);}
 
-  #When (1-cover.prob) = 1 the HDR is the empty region
-  if ((1-cover.prob) == 1) {
+  #When cover.prob = 0 the HDR is the empty set
+  if (cover.prob == 0) {
     HDR <- structure(sets::interval(), method=NA_character_);}
 
   #Compute the HDR in non-trivial cases where 0 < (1-cover.prob) < 1
@@ -22,7 +22,7 @@ hdr <- function(cover.prob, modality, Q, distribution, ...) {
 
   HDR <- structure(HDR,
                    class = c('hdr','interval'),
-                   probability = attr(HDR, "probability") %||% (1 - (1-cover.prob)),
+                   probability = attr(HDR, "probability") %||% cover.prob,
                    distribution = distribution);
 
   HDR;
