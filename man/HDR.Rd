@@ -21,7 +21,7 @@
 \title{Highest density region (HDR)}
 \usage{
 HDR.norm(
-  alpha,
+  cover.prob,
   mean = 0,
   sd = 1,
   gradtol = 1e-10,
@@ -30,7 +30,7 @@ HDR.norm(
 )
 
 HDR.lnorm(
-  alpha,
+  cover.prob,
   meanlog = 0,
   sdlog = 1,
   gradtol = 1e-10,
@@ -38,10 +38,10 @@ HDR.lnorm(
   iterlim = 100
 )
 
-HDR.t(alpha, df, ncp = 0, gradtol = 1e-10, steptol = 1e-10, iterlim = 100)
+HDR.t(cover.prob, df, ncp = 0, gradtol = 1e-10, steptol = 1e-10, iterlim = 100)
 
 HDR.cauchy(
-  alpha,
+  cover.prob,
   location = 0,
   scale = 1,
   gradtol = 1e-10,
@@ -50,7 +50,7 @@ HDR.cauchy(
 )
 
 HDR.f(
-  alpha,
+  cover.prob,
   df1,
   df2,
   ncp = 0,
@@ -60,7 +60,7 @@ HDR.f(
 )
 
 HDR.beta(
-  alpha,
+  cover.prob,
   shape1,
   shape2,
   ncp = 0,
@@ -69,10 +69,17 @@ HDR.beta(
   iterlim = 100
 )
 
-HDR.chisq(alpha, df, ncp = 0, gradtol = 1e-10, steptol = 1e-10, iterlim = 100)
+HDR.chisq(
+  cover.prob,
+  df,
+  ncp = 0,
+  gradtol = 1e-10,
+  steptol = 1e-10,
+  iterlim = 100
+)
 
 HDR.gamma(
-  alpha,
+  cover.prob,
   shape,
   rate = 1,
   scale = 1/rate,
@@ -82,7 +89,7 @@ HDR.gamma(
 )
 
 HDR.weibull(
-  alpha,
+  cover.prob,
   shape,
   scale = 1,
   gradtol = 1e-10,
@@ -90,10 +97,10 @@ HDR.weibull(
   iterlim = 100
 )
 
-HDR.exp(alpha, rate, gradtol = 1e-10, steptol = 1e-10, iterlim = 100)
+HDR.exp(cover.prob, rate, gradtol = 1e-10, steptol = 1e-10, iterlim = 100)
 
 HDR.unif(
-  alpha,
+  cover.prob,
   min = 0,
   max = 1,
   gradtol = 1e-10,
@@ -101,16 +108,23 @@ HDR.unif(
   iterlim = 100
 )
 
-HDR.hyper(alpha, m, n, k, gradtol = 1e-10, steptol = 1e-10, iterlim = 100)
+HDR.hyper(cover.prob, m, n, k, gradtol = 1e-10, steptol = 1e-10, iterlim = 100)
 
-HDR.geom(alpha, prob, gradtol = 1e-10, steptol = 1e-10, iterlim = 100)
+HDR.geom(cover.prob, prob, gradtol = 1e-10, steptol = 1e-10, iterlim = 100)
 
-HDR.binom(alpha, size, prob, gradtol = 1e-10, steptol = 1e-10, iterlim = 100)
+HDR.binom(
+  cover.prob,
+  size,
+  prob,
+  gradtol = 1e-10,
+  steptol = 1e-10,
+  iterlim = 100
+)
 
-HDR.pois(alpha, lambda, gradtol = 1e-10, steptol = 1e-10, iterlim = 100)
+HDR.pois(cover.prob, lambda, gradtol = 1e-10, steptol = 1e-10, iterlim = 100)
 
 HDR.nbinom(
-  alpha,
+  cover.prob,
   size,
   prob,
   mu,
@@ -120,7 +134,7 @@ HDR.nbinom(
 )
 }
 \arguments{
-\item{alpha}{The significance level for the HDR (scalar between zero and one).  The probability coverage for the HDR is \code{1-alpha}.}
+\item{cover.prob}{The probability coverage for the HDR (scalar between zero and one).  The significance level for the HDR i is \code{1-cover.prob}.}
 
 \item{gradtol}{Parameter for the nlm optimisation - a positive scalar giving the tolerance at which the scaled gradient is considered close enough to zero to terminate the algorithm (see [\code{nlm} doccumentation](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/nlm.html)).}
 

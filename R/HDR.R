@@ -32,7 +32,7 @@
 #' The table above shows the parameters in each of the distributions.  Some have default values, but most need to be specified.  (For the gamma
 #' distribution you should specify either the \code{rate} or \code{scale} but not both.)
 #'
-#' @param alpha The significance level for the HDR (scalar between zero and one).  The probability coverage for the HDR is \code{1-alpha}.
+#' @param cover.prob The probability coverage for the HDR (scalar between zero and one).  The significance level for the HDR i is \code{1-cover.prob}.  
 #' @param shape1,shape2,ncp,location,scale,df,rate,df1,df2,meanlog,sdlog,mean,sd,min,max,shape,size,prob,m,n,k,mu,lambda Distribution parameters.
 #' @param gradtol Parameter for the nlm optimisation - a positive scalar giving the tolerance at which the scaled gradient is considered close enough to zero to terminate the algorithm (see [\code{nlm} doccumentation](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/nlm.html)).
 #' @param steptol Parameter for the nlm optimisation - a positive scalar providing the minimum allowable relative step length (see [\code{nlm} doccumentation](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/nlm.html)).
@@ -48,7 +48,7 @@ NULL
 #' @examples
 #' HDR.norm(.05)
 #' @rdname HDR
-HDR.norm <- function(alpha, mean = 0, sd = 1,
+HDR.norm <- function(cover.prob, mean = 0, sd = 1,
                      gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
   #Check inputs
@@ -64,12 +64,12 @@ HDR.norm <- function(alpha, mean = 0, sd = 1,
                  paste0('normal distribution with mean = ', mean,
                         ' and standard deviation = ', sd));
 
-  hdr(alpha, unimodal, Q = qnorm, f = dnorm, distribution = DIST,
+  hdr(cover.prob, unimodal, Q = qnorm, f = dnorm, distribution = DIST,
                mean = mean, sd = sd,
                gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
 #' @rdname HDR
-HDR.lnorm <- function(alpha, meanlog = 0, sdlog = 1,
+HDR.lnorm <- function(cover.prob, meanlog = 0, sdlog = 1,
                       gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
   #Check inputs
@@ -85,12 +85,12 @@ HDR.lnorm <- function(alpha, meanlog = 0, sdlog = 1,
                  paste0('log-normal distribution with log-mean = ', meanlog,
                         ' and log-standard deviation = ', sdlog));
 
-  hdr(alpha, unimodal, Q = qlnorm, f = dlnorm, distribution = DIST,
+  hdr(cover.prob, unimodal, Q = qlnorm, f = dlnorm, distribution = DIST,
            meanlog = meanlog, sdlog = sdlog,
            gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
 #' @rdname HDR
-HDR.t <- function(alpha, df, ncp = 0,
+HDR.t <- function(cover.prob, df, ncp = 0,
                   gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
   #Check inputs
@@ -107,13 +107,13 @@ HDR.t <- function(alpha, df, ncp = 0,
                  paste0('Student\'s T distribution with ', df,
                         ' degrees-of-freedom and non-centrality parameter = ', ncp));
 
-  hdr(alpha, unimodal, Q = qt, f = dt, distribution = DIST,
+  hdr(cover.prob, unimodal, Q = qt, f = dt, distribution = DIST,
                df = df, ncp = ncp,
                gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
 
 #' @rdname HDR
-HDR.cauchy <- function(alpha, location = 0, scale = 1,
+HDR.cauchy <- function(cover.prob, location = 0, scale = 1,
                        gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
   #Check inputs
@@ -129,13 +129,13 @@ HDR.cauchy <- function(alpha, location = 0, scale = 1,
                  paste0('Cauchy distribution with location = ', location,
                         ' and scale = ', scale));
 
-  hdr(alpha, unimodal, Q = qcauchy, f = dcauchy, distribution = DIST,
+  hdr(cover.prob, unimodal, Q = qcauchy, f = dcauchy, distribution = DIST,
            location = location, scale = scale,
            gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
 
 #' @rdname HDR
-HDR.f <- function(alpha, df1, df2, ncp = 0,
+HDR.f <- function(cover.prob, df1, df2, ncp = 0,
                   gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
   #Check inputs
@@ -161,7 +161,7 @@ HDR.f <- function(alpha, df1, df2, ncp = 0,
 
   modality <- if(df1 <= 2) monotone else unimodal;
 
-  HDR <- hdr(alpha, modality, qf, df, distribution = DIST,
+  HDR <- hdr(cover.prob, modality, qf, df, distribution = DIST,
                   df1 = df1, df2 = df2, ncp = ncp,
                   decreasing = TRUE,
                   gradtol = gradtol, steptol = steptol, iterlim = iterlim);
@@ -170,7 +170,7 @@ HDR.f <- function(alpha, df1, df2, ncp = 0,
 
 
 #' @rdname HDR
-HDR.beta <- function(alpha, shape1, shape2, ncp = 0,
+HDR.beta <- function(cover.prob, shape1, shape2, ncp = 0,
                      gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
   #Check inputs
@@ -218,7 +218,7 @@ HDR.beta <- function(alpha, shape1, shape2, ncp = 0,
   if ((shape1 < 1) && (shape2 < 1)) {
     modality <- bimodal;}
 
-  HDR <- hdr(alpha, modality, Q = qbeta, f = dbeta, distribution = DIST,
+  HDR <- hdr(cover.prob, modality, Q = qbeta, f = dbeta, distribution = DIST,
                   shape1 = shape1, shape2 = shape2, ncp = ncp,
                   decreasing = decreasing,
                   gradtol = gradtol, steptol = steptol, iterlim = iterlim);
@@ -227,7 +227,7 @@ HDR.beta <- function(alpha, shape1, shape2, ncp = 0,
 
 
 #' @rdname HDR
-HDR.chisq <- function(alpha, df, ncp = 0,
+HDR.chisq <- function(cover.prob, df, ncp = 0,
                       gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
   #Check inputs
@@ -253,7 +253,7 @@ HDR.chisq <- function(alpha, df, ncp = 0,
   if (df > 2) {
     modality <- unimodal; }
 
-  HDR <- hdr(alpha, modality, Q = qchisq, f = dchisq, distribution = DIST,
+  HDR <- hdr(cover.prob, modality, Q = qchisq, f = dchisq, distribution = DIST,
                   df = df, ncp = ncp,
                   gradtol = gradtol, steptol = steptol, iterlim = iterlim);
 
@@ -261,7 +261,7 @@ HDR.chisq <- function(alpha, df, ncp = 0,
 
 
 #' @rdname HDR
-HDR.gamma <- function(alpha, shape, rate = 1, scale = 1/rate,
+HDR.gamma <- function(cover.prob, shape, rate = 1, scale = 1/rate,
                       gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
   #Check inputs
@@ -291,7 +291,7 @@ HDR.gamma <- function(alpha, shape, rate = 1, scale = 1/rate,
   #Compute HDR in unimodal case;
   if (shape > 1) { modality <- unimodal; }
 
-  HDR <- hdr(alpha, modality, Q = qgamma, f = dgamma, distribution = DIST,
+  HDR <- hdr(cover.prob, modality, Q = qgamma, f = dgamma, distribution = DIST,
                   shape = shape,  scale = scale,
                   gradtol = gradtol, steptol = steptol, iterlim = iterlim);
 
@@ -299,7 +299,7 @@ HDR.gamma <- function(alpha, shape, rate = 1, scale = 1/rate,
 
 
 #' @rdname HDR
-HDR.weibull <- function(alpha, shape, scale = 1,
+HDR.weibull <- function(cover.prob, shape, scale = 1,
                         gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
   #Check inputs
@@ -323,7 +323,7 @@ HDR.weibull <- function(alpha, shape, scale = 1,
   if (shape > 1) { modality <- unimodal; }
 
 
-  HDR <- hdr(alpha, modality, Q = qweibull, f = dweibull, distribution = DIST,
+  HDR <- hdr(cover.prob, modality, Q = qweibull, f = dweibull, distribution = DIST,
                       shape = shape, scale = scale,
                       decreasing = TRUE,
                       gradtol = gradtol, steptol = steptol, iterlim = iterlim);
@@ -332,7 +332,7 @@ HDR.weibull <- function(alpha, shape, scale = 1,
 
 
 #' @rdname HDR
-HDR.exp <- function(alpha, rate,
+HDR.exp <- function(cover.prob, rate,
                     gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
   #Check inputs
@@ -344,13 +344,13 @@ HDR.exp <- function(alpha, rate,
   DIST <- paste0('exponential distribution with scale = ', 1/rate);
 
   #Compute the HDR
-  hdr(alpha, monotone, Q = qexp, f = dexp, distribution = DIST,
+  hdr(cover.prob, monotone, Q = qexp, f = dexp, distribution = DIST,
            rate = rate,
            decreasing = TRUE);}
 
 
 #' @rdname HDR
-HDR.unif <- function(alpha, min = 0, max = 1,
+HDR.unif <- function(cover.prob, min = 0, max = 1,
                      gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
   #Check inputs
@@ -366,7 +366,7 @@ HDR.unif <- function(alpha, min = 0, max = 1,
                  paste0('continuous uniform distribution with minimum = ', min,
                         ' and maximum = ', max));
 
-  hdr(alpha, unimodal, Q = qunif, f = dunif, distribution = DIST,
+  hdr(cover.prob, unimodal, Q = qunif, f = dunif, distribution = DIST,
            min = min, max = max,
            gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
@@ -374,7 +374,7 @@ HDR.unif <- function(alpha, min = 0, max = 1,
 
 
 #' @rdname HDR
-HDR.hyper <- function(alpha, m, n, k,
+HDR.hyper <- function(cover.prob, m, n, k,
                       gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
   #Check inputs
@@ -394,13 +394,13 @@ HDR.hyper <- function(alpha, m, n, k,
   DIST <- paste0('hypergeometric distribution with ', m, ' white balls, ', n,
                  ' black balls, and ', k, ' balls drawn');
 
-  hdr(alpha, modality=discrete.unimodal, Q = qhyper, F = phyper, distribution = DIST,
+  hdr(cover.prob, modality=discrete.unimodal, Q = qhyper, F = phyper, distribution = DIST,
            m = m, n = n, k = k,
            gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
 
 #' @rdname HDR
-HDR.geom <- function(alpha, prob,
+HDR.geom <- function(cover.prob, prob,
                      gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
   #Check inputs
@@ -413,13 +413,13 @@ HDR.geom <- function(alpha, prob,
   #Set text for distribution
   DIST <- paste0('geometric distribution with probability = ', prob);
 
-  hdr(alpha, discrete.unimodal, Q = qgeom, F = pgeom, distribution = DIST,
+  hdr(cover.prob, discrete.unimodal, Q = qgeom, F = pgeom, distribution = DIST,
                         prob = prob,
                         gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
 
 #' @rdname HDR
-HDR.binom <- function(alpha, size, prob,
+HDR.binom <- function(cover.prob, size, prob,
                       gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
   #Check inputs
@@ -435,13 +435,13 @@ HDR.binom <- function(alpha, size, prob,
   DIST <- paste0('binomial distribution with size = ', size,
                  ' and probability = ', prob);
 
-  hdr(alpha, discrete.unimodal, Q = qbinom, F = pbinom, distribution = DIST,
+  hdr(cover.prob, discrete.unimodal, Q = qbinom, F = pbinom, distribution = DIST,
            size = size, prob = prob,
                         gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
 
 #' @rdname HDR
-HDR.pois <- function(alpha, lambda,
+HDR.pois <- function(cover.prob, lambda,
                      gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
   #Check inputs
@@ -452,13 +452,13 @@ HDR.pois <- function(alpha, lambda,
   #Set text for distribution
   DIST <- paste0('Poisson distribution with rate = ', lambda);
 
-  hdr(alpha, discrete.unimodal, Q = qpois, F = ppois, distribution = DIST,
+  hdr(cover.prob, discrete.unimodal, Q = qpois, F = ppois, distribution = DIST,
                         lambda = lambda,
                         gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
 
 #' @rdname HDR
-HDR.nbinom <- function(alpha, size, prob, mu,
+HDR.nbinom <- function(cover.prob, size, prob, mu,
                        gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
   #Check inputs
@@ -496,7 +496,7 @@ HDR.nbinom <- function(alpha, size, prob, mu,
                         size, ' and mean = ', mu));
 
 
-  hdr(alpha, discrete.unimodal, 
+  hdr(cover.prob, discrete.unimodal, 
            #Q = qnbinom, F = pbinom, 
            Q = QQ, F = FF, 
            distribution = DIST,

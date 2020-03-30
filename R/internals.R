@@ -1,39 +1,39 @@
 
-hdr <- function(alpha, modality, Q, distribution, ...) {
-  if (!is.numeric(alpha))   { stop('Error: alpha should be numeric') }
-  if (length(alpha) != 1)   { stop('Error: alpha should be a single value'); }
-  if (alpha < 0)            { stop('Error: alpha is negative'); }
-  if (alpha > 1)            { stop('Error: alpha is greater than one'); }
+hdr <- function(cover.prob, modality, Q, distribution, ...) {
+  if (!is.numeric((1-cover.prob)))   { stop('Error: (1-cover.prob) should be numeric') }
+  if (length((1-cover.prob)) != 1)   { stop('Error: (1-cover.prob) should be a single value'); }
+  if ((1-cover.prob) < 0)            { stop('Error: (1-cover.prob) is negative'); }
+  if ((1-cover.prob) > 1)            { stop('Error: (1-cover.prob) is greater than one'); }
 
-  #Compute the HDR in trivial cases where alpha is 0 or 1
-  #When alpha = 0 the HDR is the support of the distribution
-  if (alpha == 0) {
+  #Compute the HDR in trivial cases where (1-cover.prob) is 0 or 1
+  #When (1-cover.prob) = 0 the HDR is the support of the distribution
+  if ((1-cover.prob) == 0) {
     Q <- partial(Q, ...);
     HDR <- structure(sets::interval(l = Q(0), r = Q(1), bounds = 'closed'),
                      method = NA_character_);}
 
-  #When alpha = 1 the HDR is the empty region
-  if (alpha == 1) {
+  #When (1-cover.prob) = 1 the HDR is the empty region
+  if ((1-cover.prob) == 1) {
     HDR <- structure(sets::interval(), method=NA_character_);}
 
-  #Compute the HDR in non-trivial cases where 0 < alpha < 1
-  if ((alpha > 0) && (alpha < 1)) {
-    HDR <- modality(alpha=alpha, Q=Q, ...);}
+  #Compute the HDR in non-trivial cases where 0 < (1-cover.prob) < 1
+  if (((1-cover.prob) > 0) && ((1-cover.prob) < 1)) {
+    HDR <- modality(cover.prob=cover.prob, Q=Q, ...);}
 
   HDR <- structure(HDR,
                    class = c('hdr','interval'),
-                   probability = attr(HDR, "probability") %||% (1 - alpha),
+                   probability = attr(HDR, "probability") %||% (1 - (1-cover.prob)),
                    distribution = distribution);
 
   HDR;
 }
 
 
-monotone <- function(alpha, Q, f=NULL, decreasing = TRUE, ...) {
+monotone <- function(cover.prob, Q, f=NULL, decreasing = TRUE, ...) {
   Q <- partial(Q, ...);
 
-  L <- if (decreasing) Q(0)       else Q(alpha);
-  U <- if (decreasing) Q(1-alpha) else Q(1);
+  L <- if (decreasing) Q(0)       else Q((1-cover.prob));
+  U <- if (decreasing) Q(1-(1-cover.prob)) else Q(1);
 
   HDR <- structure(sets::interval(l = L, r = U, bounds = 'closed'),
                    method= 'Computed using monotone optimisation');
@@ -41,7 +41,7 @@ monotone <- function(alpha, Q, f=NULL, decreasing = TRUE, ...) {
   HDR; }
 
 
-unimodal <- function(alpha, Q, f = NULL, u = NULL, ...,
+unimodal <- function(cover.prob, Q, f = NULL, u = NULL, ...,
                      gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
   #Check inputs
@@ -59,13 +59,13 @@ unimodal <- function(alpha, Q, f = NULL, u = NULL, ...,
   WW <- function(phi) {
 
     #Set parameter functions
-    T0 <- alpha/(1+exp(-phi));
+    T0 <- (1-cover.prob)/(1+exp(-phi));
     T1 <- T0/(1+exp(phi));
     T2 <- T1*((1-exp(2*phi))/(1+2*exp(phi)+exp(2*phi)));
 
     #Set interval bounds and objective
     L  <- Q(T0);
-    U  <- Q(T0 + 1 - alpha);
+    U  <- Q(T0 + 1 - (1-cover.prob));
     W0 <- U - L;
 
     #Set gradient and Hessian of objective (if able)
@@ -82,9 +82,9 @@ unimodal <- function(alpha, Q, f = NULL, u = NULL, ...,
   #This is the exact optima in the case of a symmetric distribution
   OPT <- nlm(WW, p = 0,
              gradtol = gradtol, steptol = steptol, iterlim = iterlim);
-  TT <- alpha/(1+exp(-OPT$estimate));
+  TT <- (1-cover.prob)/(1+exp(-OPT$estimate));
   L   <- Q(TT);
-  U   <- Q(TT + 1 - alpha);
+  U   <- Q(TT + 1 - (1-cover.prob));
 
   #Add the description of the method
   METHOD <- ifelse((OPT$iterations == 1),
@@ -99,7 +99,7 @@ unimodal <- function(alpha, Q, f = NULL, u = NULL, ...,
   HDR; }
 
 
-bimodal <- function(alpha, Q, f = NULL, u = NULL, ...,
+bimodal <- function(cover.prob, Q, f = NULL, u = NULL, ...,
                     distribution = 'an unspecified input distribution',
                     gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
@@ -118,13 +118,13 @@ bimodal <- function(alpha, Q, f = NULL, u = NULL, ...,
   WW <- function(phi) {
 
     #Set parameter functions
-    T0 <- (1-alpha)/(1+exp(-phi));
+    T0 <- (1-(1-cover.prob))/(1+exp(-phi));
     T1 <- T0/(1+exp(phi));
     T2 <- T1*((1-exp(2*phi))/(1+2*exp(phi)+exp(2*phi)));
 
     #Set interval bounds and objective
     L  <- Q(T0);
-    U  <- Q(T0 + alpha);
+    U  <- Q(T0 + (1-cover.prob));
     W0 <- 1 - U + L;
 
     #Set gradient of objective (if able)
@@ -143,9 +143,9 @@ bimodal <- function(alpha, Q, f = NULL, u = NULL, ...,
   #This is the exact optima in the case of a symmetric distribution
   OPT <- nlm(f = WW, p = 0,
              gradtol = gradtol, steptol = steptol, iterlim = iterlim);
-  TT <- alpha/(1+exp(-OPT$estimate));
-  L  <- Q(TT*(1-alpha)/alpha);
-  U  <- Q(TT*(1-alpha)/alpha + alpha);
+  TT <- (1-cover.prob)/(1+exp(-OPT$estimate));
+  L  <- Q(TT*(1-(1-cover.prob))/(1-cover.prob));
+  U  <- Q(TT*(1-(1-cover.prob))/(1-cover.prob) + (1-cover.prob));
   HDR1 <- sets::interval(l = Q(0), r = L, bounds = 'closed');
   HDR2 <- sets::interval(l = U, r = Q(1), bounds = 'closed');
 
@@ -186,7 +186,7 @@ partial <- function(FUN, ...) {
 
 
 
-discrete.unimodal <- function(alpha, Q, F, f = NULL, s = NULL, ...,
+discrete.unimodal <- function(cover.prob, Q, F, f = NULL, s = NULL, ...,
                               gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
 
   #Check inputs
@@ -199,12 +199,12 @@ discrete.unimodal <- function(alpha, Q, F, f = NULL, s = NULL, ...,
   #Compute the HDR
 
   MIN <- Q(0);
-  MAX <- Q(alpha);
+  MAX <- Q((1-cover.prob));
   TT  <- F(MIN:MAX);
   W   <- rep(NA, length(TT));
   P   <- rep(NA, length(TT));
   for (L in MIN:MAX) { LP     <- ifelse(L > MIN, F(L-1), 0);
-  U      <- Q(LP+1-alpha);
+  U      <- Q(LP+1-(1-cover.prob));
   W[L-MIN+1] <- U-L+1;
   P[L-MIN+1] <- F(U) - LP; }
   for (i in 1:length(TT)) { if (W[i] != min(W)) P[i] <- 0; }
@@ -214,6 +214,6 @@ discrete.unimodal <- function(alpha, Q, F, f = NULL, s = NULL, ...,
   HDR <- structure(sets::integers(l = L, r = U),
                    probability = F(U) - ifelse(L > 0, F(L-1), 0),
                    method = paste0('Computed using discrete optimisation with minimum coverage probability = ',
-                                   sprintf(100*(1-alpha), fmt = '%#.2f'), '%'))
+                                   sprintf(100*(1-(1-cover.prob)), fmt = '%#.2f'), '%'))
 
   HDR; }
