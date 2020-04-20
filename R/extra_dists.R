@@ -172,10 +172,6 @@ HDR.benini <- function(cover.prob, shape, y0, scale = y0,
   if (length(scale) != 1)   { stop('Error: scale should be a single value'); }
   if (scale <= 0)           { stop('Error: scale should be positive'); }
   
-  #Simplify probability functions (with stipulated parameters)
-  QQ <- function(L) { VGAM::qbenini(L, y0 = scale, shape = shape); }
-  DD <- function(L) { VGAM::dbenini(L, y0 = scale, shape = shape); }
-  
   #Set text for distribution
   DIST <- paste0('Benini distribution with shape = ', shape, 
                  ' and scale = ', scale);
@@ -207,18 +203,17 @@ HDR.fatigue <- function(cover.prob, alpha, beta = 1, mu = 0,
   if (!is.numeric(mu))      { stop('Error: mu should be numeric') }
   if (length(mu) != 1)      { stop('Error: mu should be a single value'); }
   
-  #Simplify probability functions (with stipulated parameters)
-  QQ <- function(L) { extraDistr::qfatigue(L, alpha, beta, mu); }
-  DD <- function(L) { extraDistr::dfatigue(L, alpha, beta, mu); }
-  
   #Set text for distribution
   DIST <- ifelse(((location == 0)&(scale == 1)), 
                  paste0('standard fatigue-life (Birnbaum-Saunders) distribution with shape = ', alpha),
                  paste0('fatigue-life (Birnbaum-Saunders) distribution with shape = ', alpha, ', scale = ', beta, ' and location = ', mu));
   
   #Compute HDR
-  HDR <- HDR.unimodal(cover.prob, Q = QQ, f = DD, distribution = DIST,
-                      gradtol = gradtol, steptol = steptol, iterlim = iterlim);
+  HDR <- hdr(cover.prob, modality = unimodal, Q = extraDistr::qfatigue, f = extraDistr::dfatigue,
+             distribution = DIST,
+             alpha = alpha, beta = beta, mu = mu,
+             gradtol = gradtol, steptol = steptol, iterlim = iterlim);
+  
   
   HDR; }
 
@@ -240,25 +235,16 @@ HDR.gpd <- function(cover.prob, mu = 0, sigma = 1, xi = 0,
   if (!is.numeric(shape))   { stop('Error: shape should be numeric') }
   if (length(shape) != 1)   { stop('Error: shape should be a single value'); }
   
-  #Simplify probability functions (with stipulated parameters)
-  QQ <- function(L) { extraDistr::qgpd(L, mu = location, 
-                                       sigma = scale, xi = shape); }
-  DD <- function(L) { extraDistr::dgpd(L, mu = location, 
-                                       sigma = scale, xi = shape); }
-  
   #Set text for distribution
   DIST <- paste0('generalised Pareto distribution with location = ', location,
                  ', scale = ', scale, ' and shape = ', shape);
-  
-  #Compute HDR in monotone case
-  if (shape >= -1) {
-    HDR <- HDR.monotone(cover.prob, Q = QQ, f = DD, distribution = DIST); }
-  
-  #Compute HDR in monotone case
-  if (shape < -1) {
-    HDR <- HDR.monotone(cover.prob, Q = QQ, f = DD, distribution = DIST,
-                        decreasing = FALSE); }
-  
+
+
+  HDR <- hdr(cover.prob, modality = unimodal, Q = extraDistr::qgpd, f = extraDistr::dgpd,
+             distribution = DIST, decreasing = shape >= -1,
+             mu = location, sigma = scale, xi= shape,
+             gradtol = gradtol, steptol = steptol, iterlim = iterlim);  
+    
   HDR; }
 
 
@@ -277,22 +263,16 @@ HDR.gompertz <- function(cover.prob, shape = 1, scale = 1,
   if (length(scale) != 1)   { stop('Error: scale should be a single value'); }
   if (scale < 0)            { stop('Error: scale is negative'); }
   
-  #Simplify probability functions (with stipulated parameters)
-  QQ <- function(L) { extraDistr::qgompertz(L, a = shape, b = scale); }
-  DD <- function(L) { extraDistr::dgompertz(L, a = shape, b = scale); }
-  
   #Set text for distribution
   DIST <- paste0('Gompertz distribution with shape = ', shape,
                  ' and scale = ', scale);
   
-  #Compute HDR in monotonic case
-  if (shape >= 1) {
-    HDR <- HDR.monotone(cover.prob, Q = QQ, f = DD, distribution = DIST); }
   
-  #Compute HDR in unimodal case
-  if (shape <  1) {
-    HDR <- HDR.unimodal(cover.prob, Q = QQ, f = DD, distribution = DIST,
-                        gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
+  HDR <- hdr(cover.prob, modality = unimodal, Q = extraDistr::qgompertz, f = extraDistr::dgompertz,
+             distribution = DIST, decreasing = shape >= -1,
+             b = scale, a = shape,
+             gradtol = gradtol, steptol = steptol, iterlim = iterlim);  
+  
   
   HDR; }
 
@@ -314,11 +294,6 @@ HDR.huber <- function(cover.prob, mu, sigma, epsilon,
   if (length(epsilon) != 1) { stop('Error: epsilon should be a single value'); }
   if (epsilon <= 0)         { stop('Error: epsilon must be positive'); }
   
-  #Simplify probability functions (with stipulated parameters)
-  QQ <- function(L) { extraDistr::qhuber(L, mu = mu, sigma = sigma, 
-                                         epsilon = epsilon); }
-  DD <- function(L) { extraDistr::dhuber(L, mu = mu, sigma = sigma, 
-                                         epsilon = epsilon); }
   
   #Set text for distribution
   if (epsilon == Inf) {
@@ -330,9 +305,12 @@ HDR.huber <- function(cover.prob, mu, sigma, epsilon,
     DIST <- paste0('Huber distribution with mean = ', mu,
                    ', scale = ', sigma, ' and cut-point = ', epsilon); }
   
-  #Compute HDR in unimodal case
-  HDR <- HDR.unimodal(cover.prob, Q = QQ, f = DD, distribution = DIST,
-                      gradtol = gradtol, steptol = steptol, iterlim = iterlim);
+  
+  HDR <- hdr(cover.prob, modality = unimodal, Q = extraDistr::qhuber, f = extraDistr::dhuber,
+             distribution = DIST,
+             mu = mu, sigma = sigma, epsilon = epsilon,
+             gradtol = gradtol, steptol = steptol, iterlim = iterlim);  
+  
   
   HDR; }
 
@@ -352,41 +330,46 @@ HDR.kumar <- function(cover.prob, a = 1, b = 1, shape1 = a, shape2 = b,
   if (length(shape2) != 1)  { stop('Error: shape2 should be a single value'); }
   if (shape2 < 0)           { stop('Error: shape2 is negative'); }
   
-  #Simplify probability functions (with stipulated parameters)
-  QQ <- function(L) { extraDistr::qkumar(L, a = shape1, b = shape2); }
-  DD <- function(L) { extraDistr::dkumar(L, a = shape1, b = shape2); }
-  
   #Set text for distribution
   DIST <- ifelse(((shape1 == 1)&(shape2 == 1)), 
                  'uniform distribution',
                  paste0('Kumaraswamy distribution with shape1 = ', shape1, 
                         ' and shape2 = ', shape2));
   
+  decreasing <- FALSE;
+  
   #Compute HDR in monotone decreasing case
   if ((shape1 <= 1) && (shape2 >  1)) {
-    HDR <- HDR.monotone(cover.prob, Q = QQ, f = DD, distribution = DIST,
-                        decreasing = TRUE); }
-  
+    modality <- monotone;
+    decreasing <- TRUE;
+  }
+
   #Compute HDR in monotone increasing case
   if ((shape1 >  1) && (shape2 <= 1)) {
-    HDR <- HDR.monotone(cover.prob, Q = QQ, f = DD, distribution = DIST,
-                        decreasing = FALSE); }
-  
+    modality <- monotone;
+  }
+
   #Compute HDR in uniform case
   if ((shape1 == 1) && (shape2 == 1)) {
-    HDR <- HDR.unimodal(cover.prob, Q = QQ, f = DD, distribution = DIST,
-                        gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
-  
+    modality <- unimodal
+  }
+
   #Compute HDR in unimodal case
   if ((shape1 > 1) && (shape2 > 1)) {
-    HDR <- HDR.unimodal(cover.prob, Q = QQ, f = DD, distribution = DIST,
-                        gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
+    modality <- unimodal
+  }
   
   #Compute HDR in bimodal case
   if ((shape1 < 1) && (shape2 < 1)) {
-    HDR <- HDR.bimodal(cover.prob, Q = QQ, f = DD, distribution = DIST,
-                       gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
+    modality <- bimodal
+  }
   
+  HDR <- hdr(cover.prob, modality = modality, Q = extraDistr::qkumar, f = extraDistr::dkumar,
+             distribution = DIST, decreasing = decreasing,
+             a = shape1, b = shape2,
+             gradtol = gradtol, steptol = steptol, iterlim = iterlim);  
+  
+
   HDR; }
 
 
@@ -407,17 +390,18 @@ HDR.frechet <- function(cover.prob, shape, scale = 1, location = 0,
   if (!is.numeric(location)) { stop('Error: location should be numeric') }
   if (length(location) != 1) { stop('Error: location should be a single value'); }
   
-  #Simplify probability functions (with stipulated parameters)
-  QQ <- function(L) { VGAM::qfrechet(L, shape = shape, scale = scale, location = location); }
-  DD <- function(L) { VGAM::dfrechet(L, shape = shape, scale = scale, location = location); }
-  
   #Set text for distribution
   DIST <- paste0('Fréchet distribution with shape = ', shape,
                  ', scale = ', scale, ' and location = ', location);
   
-  #Compute HDR
-  HDR <- HDR.unimodal(cover.prob, Q = QQ, f = DD, distribution = DIST,
-                      gradtol = gradtol, steptol = steptol, iterlim = iterlim);
+  
+  
+  HDR <- hdr(cover.prob, modality = uunimodal, Q = VGAM::qfrechet, f = VGAM::dfrechet,
+             distribution = DIST, 
+             shape = shape, scale = scale, location = location,
+             gradtol = gradtol, steptol = steptol, iterlim = iterlim);  
+  
+  
   
   HDR; }
 
@@ -437,17 +421,16 @@ HDR.gumbelII <- function(cover.prob, shape, scale = 1,
   if (length(scale) != 1)   { stop('Error: scale should be a single value'); }
   if (scale < 0)            { stop('Error: scale is negative'); }
   
-  #Simplify probability functions (with stipulated parameters)
-  QQ <- function(L) { VGAM::qgumbelII(L, shape = shape, scale = scale); }
-  DD <- function(L) { VGAM::dgumbelII(L, shape = shape, scale = scale); }
-  
   #Set text for distribution
   DIST <- paste0('Gumbel (Type II) distribution with shape = ', shape,
                  ' and scale = ', scale);
   
-  #Compute HDR
-  HDR <- HDR.unimodal(cover.prob, Q = QQ, f = DD, distribution = DIST,
-                      gradtol = gradtol, steptol = steptol, iterlim = iterlim);
+  
+  HDR <- hdr(cover.prob, modality = uunimodal, Q = VGAM::qgumbelII, f = VGAM::dgumbelII,
+             distribution = DIST, 
+             shape = shape, scale = scale,
+             gradtol = gradtol, steptol = steptol, iterlim = iterlim);  
+  
   
   HDR; }
 
@@ -469,17 +452,16 @@ HDR.lgamma <- function(cover.prob, shape = 1, scale = 1, location = 0,
   if (!is.numeric(location)) { stop('Error: location should be numeric') }
   if (length(location) != 1) { stop('Error: location should be a single value'); }
   
-  #Simplify probability functions (with stipulated parameters)
-  QQ <- function(L) { VGAM::qlgamma(L, shape = shape, scale = scale, location = location); }
-  DD <- function(L) { VGAM::dlgamma(L, shape = shape, scale = scale, location = location); }
-  
   #Set text for distribution
   DIST <- paste0('log-gamma distribution with shape = ', shape,
                  ', scale = ', scale, ' and location = ', location);
   
-  #Compute HDR
-  HDR <- HDR.unimodal(cover.prob, Q = QQ, f = DD, distribution = DIST,
-                      gradtol = gradtol, steptol = steptol, iterlim = iterlim);
+  HDR <- hdr(cover.prob, modality = unimodal, Q = VGAM::qlgamma, f = VGAM::dlgamma,
+             distribution = DIST, 
+             shape = shape, scale = scale, location = location,
+             gradtol = gradtol, steptol = steptol, iterlim = iterlim);  
+  
+  
   
   HDR; }
 
@@ -488,10 +470,8 @@ HDR.gengamma <- function(cover.prob, d, shape1 = d, k, shape2 = k,
                          rate = 1, scale = 1/rate,
                          gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
-  #Check for required package
-  if (!requireNamespace('VGAM', quietly = TRUE)) {
-    stop('Package \'VGAM\' is required for this function; if you install that package you can run this function.', call. = FALSE) }
-  
+  requireVGAM()
+    
   #Check inputs
   if (!is.numeric(shape1))  { stop('Error: shape1 should be numeric') }
   if (length(shape1) != 1)  { stop('Error: shape1 should be a single value'); }
@@ -510,23 +490,22 @@ HDR.gengamma <- function(cover.prob, d, shape1 = d, k, shape2 = k,
       warning('specify rate or scale but not both') else
         stop('Error: specify rate or scale but not both'); }
   
-  #Simplify probability functions (with stipulated parameters)
-  QQ <- function(L) { VGAM::qgengamma.stacy(L, scale = scale, d = shape1, k = shape2); }
-  DD <- function(L) { VGAM::dgengamma.stacy(L, scale = scale, d = shape1, k = shape2); }
-  
   #Set text for distribution
   DIST <- paste0('generalised gamma (Stacy) distribution with shape1 = ', shape1,
                  ', shape2 = ', shape2, ' and scale = ', scale);
   
   #Compute HDR in monotone case
   if (shape1 <= 1) {
-    HDR <- HDR.monotone(cover.prob, Q = QQ, f = DD, distribution = DIST,
-                        gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
+    modality <- monotone
+  } else if (shape1 > 1) {
+    modality <- unimodal 
+  }
+
+  HDR <- hdr(cover.prob, modality = modality, Q = VGAM::qgengamma.stacy, f = VGAM::dgengamma.stacy,
+             distribution = DIST, 
+             scale = scale, d = shape1, k = shape2,
+             gradtol = gradtol, steptol = steptol, iterlim = iterlim);  
   
-  #Compute HDR in unimodal case
-  if (shape1 > 1) {
-    HDR <- HDR.unimodal(cover.prob, Q = QQ, f = DD, distribution = DIST,
-                        gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
   
   HDR; }
 
@@ -535,9 +514,7 @@ HDR.tnorm <- function(cover.prob, mean = 0, sd = 1,
                       a = -Inf, b = Inf, min = a, max = b,
                       gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
-  #Check for required package
-  if (!requireNamespace('extraDistr', quietly = TRUE)) {
-    stop('Package \'extraDistr\' is required for this function; if you install that package you can run this function.', call. = FALSE) }
+  requireExtraDist()
   
   #Check inputs
   if (!is.numeric(mean))    { stop('Error: mean should be numeric') }
@@ -581,8 +558,11 @@ HDR.tnorm <- function(cover.prob, mean = 0, sd = 1,
                           ' and standard deviation = ', sd, ' with min = ', 
                           min, ' and max = ', max)); }
   
-  #Compute HDR
-  HDR <- HDR.unimodal(cover.prob, Q = QQ, f = DD, distribution = DIST,
-                      gradtol = gradtol, steptol = steptol, iterlim = iterlim);
+  
+  HDR <- hdr(cover.prob, modality = unimodal, Q = extraDistr::qtnorm, f = extraDistr::dtnorm,
+             distribution = DIST, 
+             mean = mean, sd = sd, a = min, b = max,
+             gradtol = gradtol, steptol = steptol, iterlim = iterlim);  
+  
   
   HDR; }
