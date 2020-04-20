@@ -1,7 +1,3 @@
-
-#The functions below are the CONF.mean and CONF.var functions, which give optimised confidence intervals for the mean and variance of a population, taken from a set of sample data.  These functions allow specification of the population size, and in cases where this is finite, the confidence intervals impose a “finite population correction”.  These functions generate an interval object with additional class ci, which has its own custom print method.
-
-
 CONF.mean <- function(alpha, x = NULL, sample.mean = mean(x), 
                       sample.variance = var(x), n = length(x),
                       N = Inf, kurt = 3, unsampled = FALSE,
@@ -74,9 +70,24 @@ CONF.mean <- function(alpha, x = NULL, sample.mean = mean(x),
   CONF <- sets::interval(l = L, r = U, bounds = 'closed');
   attr(CONF, 'method') <- as.character(NA);
   
+  #Add the description of the data
+  if (is.null(x)) {
+    DATADESC <- paste0('Interval uses ', n, ' data points with sample mean = ',
+                       sprintf(sample.mean, fmt = '%#.4f'), 
+                       ', sample variance ', 
+                       sprintf(sample.variance, fmt = '%#.4f'),
+                       ' and assumed kurtosis = ', 
+                       sprintf(kurt, fmt = '%#.4f')) } else {
+                         DATADESC <- paste0('Interval uses ', n, ' data points from data ', 
+                                            deparse(substitute(x)), ' with sample variance = ', 
+                                            sprintf(sample.variance, fmt = '%#.4f'),
+                                            ' and assumed kurtosis = ', 
+                                            sprintf(kurt, fmt = '%#.4f')); }
+  attr(CONF, 'data') <- DATADESC;
+  
   #Add class and attributes
   class(CONF) <- c('ci', 'interval');
-  attr(CONF, 'probability') <- 1 - alpha;
+  attr(CONF, 'confidence') <- 1 - alpha;
   attr(CONF, 'parameter')   <- if (N == Inf) {
     paste0('mean parameter for infinite population') } else {
       if (unsampled) {
@@ -85,11 +96,10 @@ CONF.mean <- function(alpha, x = NULL, sample.mean = mean(x),
   
   CONF; }
 
-
-CONF.variance <- function(alpha, x = NULL, 
-                          sample.variance = var(x), n = length(x), 
-                          N = Inf, kurt = 3, unsampled = FALSE, 
-                          gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
+CONF.var <- function(alpha, x = NULL, 
+                     sample.variance = var(x), n = length(x), 
+                     N = Inf, kurt = 3, unsampled = FALSE, 
+                     gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
   #Check input alpha
   if (!is.numeric(alpha))   { stop('Error: alpha should be numeric') }
@@ -128,6 +138,8 @@ CONF.variance <- function(alpha, x = NULL,
   if (kurt < 1)             { stop('Error: kurt is less than one'); }
   if (!is.logical(unsampled)) { stop('Error: unsampled should be TRUE/FALSE') }
   if (length(unsampled) != 1) { stop('Error: unsampled should be a single value'); }
+  if ((unsampled) & (N-n < 3)) {
+    stop('Error: Method requires N-n > 2'); }
   
   #Check inputs for nlm
   if (!is.numeric(gradtol)) { stop('Error: gradtol should be numeric') }
@@ -142,62 +154,194 @@ CONF.variance <- function(alpha, x = NULL,
   
   #############
   
-  #Simplify probability functions (with stipulated parameters)
-  df1 <- 2*n/(kurt - (n-3)/(n-1));
-  df2 <- 2*(N-n)/(2 + (kurt-3)*(1-2/N-1/(N*n)));
-  Q <- function(L) { qf(L, df1, df2); }
-  f <- function(L) { df(L, df1, df2); }
+  if (!unsampled) {
+    
+    #Simplify probability functions (with stipulated parameters)
+    df1 <- 2*n/(kurt - (n-3)/(n-1));
+    df2 <- 2*(N-n)/(2 + (kurt-3)*(1-2/N-1/(N*n)));
+    Q <- function(L) { qf(L, df1, df2); }
+    f <- function(L) { df(L, df1, df2); }
+    
+    #Set objective function
+    WW <- function(phi) { 
+      
+      #Set parameter functions
+      T0 <- alpha/(1+exp(-phi));
+      T1 <- T0/(1+exp(phi));
+      T2 <- T1*((1-exp(2*phi))/(1+2*exp(phi)+exp(2*phi)));
+      
+      #Set interval bounds and objective
+      L  <- Q(T0);
+      U  <- Q(T0 + 1 - alpha);
+      W0 <- 1/L - 1/U;
+      
+      #Set gradient of objective
+      if (!is.null(f)) { 
+        attr(W0, 'gradient') <- T1*(1/(f(U)*U^2) - 1/(f(L)*L^2)); }
+      
+      W0; }
+    
+    #Compute the HDR
+    #The starting value for the parameter phi is set to zero
+    #This is the exact optima in the case of a symmetric distribution
+    OPT <- nlm(WW, p = 0, 
+               gradtol = gradtol, steptol = steptol, iterlim = iterlim);
+    TT <- alpha/(1+exp(-OPT$estimate));
+    A <- (n-1)/(N-1);
+    B <- if (N == Inf) { 1 } else { (N-n)/(N-1) }
+    L   <- A + B/Q(TT + 1 - alpha);
+    U   <- A + B/Q(TT);
+    CONF <- sample.variance*sets::interval(l = L, r = U, bounds = 'closed');
+    
+    #Add the description of the method
+    METHOD <- ifelse((OPT$iterations == 1), 
+                     paste0('Computed using nlm optimisation with ', 
+                            OPT$iterations, ' iteration (code = ', OPT$code, ')'),
+                     paste0('Computed using nlm optimisation with ', 
+                            OPT$iterations, ' iterations (code = ', OPT$code, ')'));
+    attr(CONF, 'method') <- METHOD; }
   
-  #Set objective function
-  WW <- function(phi) { 
+  if (unsampled) {
     
-    #Set parameter functions
-    T0 <- alpha/(1+exp(-phi));
-    T1 <- T0/(1+exp(phi));
-    T2 <- T1*((1-exp(2*phi))/(1+2*exp(phi)+exp(2*phi)));
+    #Simplify probability functions (with stipulated parameters)
+    df1 <- 2*n/(kurt - (n-3)/(n-1));
+    df2 <- 2*(N-n)/(kurt - (N-n-3)/(N-n-1));
+    Q <- function(L) { qf(L, df1, df2); }
+    f <- function(L) { df(L, df1, df2); }
     
-    #Set interval bounds and objective
-    L  <- Q(T0);
-    U  <- Q(T0 + 1 - alpha);
-    W0 <- 1/L - 1/U;
+    #Set objective function
+    WW <- function(phi) { 
+      
+      #Set parameter functions
+      T0 <- alpha/(1+exp(-phi));
+      T1 <- T0/(1+exp(phi));
+      T2 <- T1*((1-exp(2*phi))/(1+2*exp(phi)+exp(2*phi)));
+      
+      #Set interval bounds and objective
+      L  <- Q(T0);
+      U  <- Q(T0 + 1 - alpha);
+      W0 <- 1/L - 1/U;
+      
+      #Set gradient of objective
+      if (!is.null(f)) { 
+        attr(W0, 'gradient') <- T1*(1/(f(U)*U^2) - 1/(f(L)*L^2)); }
+      
+      W0; }
     
-    #Set gradient of objective
-    if (!is.null(f)) { 
-      attr(W0, 'gradient') <- T1*(1/(f(U)*U^2) - 1/(f(L)*L^2)); }
+    #Compute the HDR
+    #The starting value for the parameter phi is set to zero
+    #This is the exact optima in the case of a symmetric distribution
+    OPT <- nlm(WW, p = 0, 
+               gradtol = gradtol, steptol = steptol, iterlim = iterlim);
+    TT <- alpha/(1+exp(-OPT$estimate));
+    L   <- 1/Q(TT + 1 - alpha);
+    U   <- 1/Q(TT);
+    CONF <- sample.variance*sets::interval(l = L, r = U, bounds = 'closed');
     
-    W0; }
+    #Add the description of the method
+    METHOD <- ifelse((OPT$iterations == 1), 
+                     paste0('Computed using nlm optimisation with ', 
+                            OPT$iterations, ' iteration (code = ', OPT$code, ')'),
+                     paste0('Computed using nlm optimisation with ', 
+                            OPT$iterations, ' iterations (code = ', OPT$code, ')'));
+    attr(CONF, 'method') <- METHOD; }
   
-  #Compute the HDR
-  #The starting value for the parameter phi is set to zero
-  #This is the exact optima in the case of a symmetric distribution
-  OPT <- nlm(WW, p = 0, 
-             gradtol = gradtol, steptol = steptol, iterlim = iterlim);
-  TT <- alpha/(1+exp(-OPT$estimate));
-  A <- (n-1)/(N-1);
-  B <- if (N == Inf) { 1 } else { (N-n)/(N-1) }
-  L   <- A + B/Q(TT + 1 - alpha);
-  U   <- A + B/Q(TT);
-  CONF <- sample.variance*sets::interval(l = L, r = U, bounds = 'closed');
-  
-  #Add the description of the method
-  METHOD <- ifelse((OPT$iterations == 1), 
-                   paste0('Computed using nlm optimisation with ', 
-                          OPT$iterations, ' iteration (code = ', OPT$code, ')'),
-                   paste0('Computed using nlm optimisation with ', 
-                          OPT$iterations, ' iterations (code = ', OPT$code, ')'));
-  attr(CONF, 'method') <- METHOD;
+  #Add the description of the data
+  if (is.null(x)) {
+    DATADESC <- paste0('Interval uses ', n, 
+                       ' data points with sample variance = ', 
+                       sprintf(sample.variance, fmt = '%#.4f'),
+                       ' and assumed kurtosis = ', 
+                       sprintf(kurt, fmt = '%#.4f')) } else {
+                         DATADESC <- paste0('Interval uses ', n, ' data points from data ', 
+                                            deparse(substitute(x)), ' with sample variance = ', 
+                                            sprintf(sample.variance, fmt = '%#.4f'),
+                                            ' and assumed kurtosis = ', 
+                                            sprintf(kurt, fmt = '%#.4f')); }
+  attr(CONF, 'data') <- DATADESC;
   
   #Add class and attributes
-  class(CONF) <- c('CI', 'interval');
+  class(CONF) <- c('ci', 'interval');
   attr(CONF, 'confidence')  <- 1 - alpha;
   attr(CONF, 'parameter')   <- if (N == Inf) {
     paste0('variance parameter for infinite population') } else {
       if (unsampled) {
         paste0('variance for unsampled population of size ', N-n) } else {
-          paste0(' variance for population of size ', N) } }
+          paste0('variance for population of size ', N) } }
   
   CONF; }
 
+CONF.prop <- function(alpha, x = NULL, 
+                      sample.prop = mean(x), n = length(x),
+                      N = Inf, unsampled = FALSE) {
+  
+  #Check input alpha
+  if (!is.numeric(alpha))   { stop('Error: alpha should be numeric') }
+  if (length(alpha) != 1)   { stop('Error: alpha should be a single value'); }
+  if (alpha < 0)            { stop('Error: alpha is negative'); }
+  if (alpha > 1)            { stop('Error: alpha is greater than one'); }
+  
+  #Check congruence of data inputs
+  if ((!missing(x) && !missing(sample.prop))) {
+    if (abs(sample.prop - mean(x)) < 1e-15) 
+      warning('specify data or sample proportion but not both') else
+        stop('Error: specify data or sample proportion but not both'); }
+  if ((!missing(x) && !missing(n))) {
+    if (n != length(x)) 
+      stop('Error: specify data or n but not both'); }
+  
+  #Check data inputs
+  P <- sample.prop;
+  if (!missing(x)) {
+    if (!is.numeric(x))     { stop('Error: x should be numeric') }
+    if (!all(x %in% c(0L,1L))) { stop('Error: x should be binary data') } }
+  if (!is.numeric(P))       { stop('Error: sample proportion should be numeric') }
+  if (length(P) != 1)       { stop('Error: sample proportion should be a single value'); }
+  if (!is.numeric(n))       { stop('Error: n should be numeric') }
+  if (as.integer(n) != n)   { stop('Error: n should be an integer') }
+  if (length(n) != 1)       { stop('Error: n should be a single value'); }
+  if (n < 1)                { stop('Error: Must have at least one data point'); }
+  
+  #Compute the confidence interval in trivial cases
+  if (alpha == 0) {
+    CONF <- sets::interval(l = 0, r = 1, bounds = 'closed'); }
+  if (alpha == 1) {
+    CONF <- sets::interval(l = P, r = P, bounds = 'closed'); }
+  
+  #Compute the confidence interval in non-trivial case
+  if ((alpha > 0) && (alpha < 1)) {
+    if (N == Inf) {
+      psi <- qchisq(1-alpha, df = 1)/(2*n) } else {
+        if (unsampled) {
+          psi <- ((N-1)/(N-n))*qchisq(1-alpha, df = 1)/(2*n) } else {
+            psi <- ((N-n)/(N-1))*qchisq(1-alpha, df = 1)/(2*n) } }
+    T1  <- (P+psi)/(1+2*psi);
+    T2  <- sqrt(2*psi*P*(1-P) + psi^2)/(1+2*psi);
+    L   <- T1 - T2;
+    U   <- T1 + T2;
+    CONF <- sets::interval(l = L, r = U, bounds = 'closed'); }
+  
+  #Add the description of the data
+  if (missing(x)) {
+    DATADESC <- paste0('Interval uses ', n, 
+                       ' binary data points with sample proportion = ', 
+                       sprintf(P, fmt = '%#.4f')) } else {
+                         DATADESC <- paste0('Interval uses ', n, ' binary data points from data ', 
+                                            deparse(substitute(x)), ' with sample proportion = ', 
+                                            sprintf(P, fmt = '%#.4f')) }
+  attr(CONF, 'data') <- DATADESC;
+  
+  #Add class and attributes
+  class(CONF) <- c('ci', 'interval');
+  attr(CONF, 'method')      <- as.character(NA);
+  attr(CONF, 'confidence')  <- 1 - alpha;
+  attr(CONF, 'parameter')   <- if (N == Inf) {
+    paste0('proportion parameter for infinite population') } else {
+      if (unsampled) {
+        paste0('proportion for unsampled population of size ', N-n) } else {
+          paste0('proportion for population of size ', N) } }
+  
+  CONF; }
 
 print.ci <- function(object) {
   
@@ -205,6 +349,9 @@ print.ci <- function(object) {
   cat('\n        Confidence Interval (CI) \n \n');
   cat(paste0(sprintf(100*attributes(object)$confidence, fmt = '%#.2f'), '%'),
       'CI for', attributes(object)$parameter, '\n');
+  
+  #Print data description
+  cat(attributes(object)$data, '\n');
   
   #Print method
   if (!is.na(attributes(object)$method)) {
@@ -215,4 +362,3 @@ print.ci <- function(object) {
   writeLines(as.character(c(object)))
   invisible(c(object))
   cat('\n'); }
-
