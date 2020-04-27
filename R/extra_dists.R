@@ -23,8 +23,8 @@ HDR.arcsine <- function(cover.prob, min = 0, max = 1,
                  gradtol = gradtol, steptol = steptol, iterlim = iterlim);
   
     
-  HDR <- (max-min)*betaHDR + min; 
-  HDR}
+  betaHDR[] <- (max-min)*betaHDR + min; 
+  betaHDR}
 
 
 
