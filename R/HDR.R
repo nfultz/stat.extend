@@ -27,7 +27,14 @@
 #'   HDR.geom    \tab prob     \tab        \tab       \cr
 #'   HDR.hyper   \tab m        \tab n      \tab k     \cr
 #'   HDR.nbinom  \tab size     \tab prob   \tab mu    \cr
-#'   HDR.pois    \tab lambda   \tab        \tab       \cr }
+#'   HDR.pois    \tab lambda   \tab        \tab       \cr 
+#'   
+#'   HDR.arcsine \tab min      \tab max    \tab       \cr
+#'   HDR.invchisq\tab df       \tab ncp    \tab       \cr
+#'   HDR.invgamma\tab shape    \tab rate   \tab scale \cr
+#'   HDR.invexp  \tab rate     \tab        \tab       \cr
+#'   
+#'   }
 #'
 #' The table above shows the parameters in each of the distributions.  Some have default values, but most need to be specified.  (For the gamma
 #' distribution you should specify either the \code{rate} or \code{scale} but not both.)
