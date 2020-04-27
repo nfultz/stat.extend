@@ -438,9 +438,7 @@ HDR.gumbelII <- function(cover.prob, shape, scale = 1,
 HDR.lgamma <- function(cover.prob, shape = 1, scale = 1, location = 0,
                        gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
-  #Check for required package
-  if (!requireNamespace('VGAM', quietly = TRUE)) {
-    stop('Package \'VGAM\' is required for this function; if you install that package you can run this function.', call. = FALSE) }
+  requireVGAM()
   
   #Check inputs
   if (!is.numeric(shape))   { stop('Error: shape should be numeric') }
