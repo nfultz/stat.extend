@@ -1,0 +1,17 @@
+HDR	HDR
+HDR.beta	HDR
+HDR.binom	HDR
+HDR.cauchy	HDR
+HDR.chisq	HDR
+HDR.exp	HDR
+HDR.f	HDR
+HDR.gamma	HDR
+HDR.geom	HDR
+HDR.hyper	HDR
+HDR.lnorm	HDR
+HDR.nbinom	HDR
+HDR.norm	HDR
+HDR.pois	HDR
+HDR.t	HDR
+HDR.unif	HDR
+HDR.weibull	HDR
