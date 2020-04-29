@@ -32,9 +32,7 @@ HDR.arcsine <- function(cover.prob, min = 0, max = 1,
 HDR.invchisq <- function(cover.prob, df, ncp = 0,
                          gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
-  #Check for required package
-  if (!requireNamespace('invgamma', quietly = TRUE)) {
-    stop('Package \'invgamma\' is required for this function; if you install that package you can run this function.', call. = FALSE) }
+  requireInvgamma()
   
   #Check inputs
   if (!is.numeric(df))      { stop('Error: df should be numeric') }
@@ -63,9 +61,7 @@ HDR.invchisq <- function(cover.prob, df, ncp = 0,
 HDR.invgamma <- function(cover.prob, shape, rate = 1, scale = 1/rate,
                          gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
-  #Check for required package
-  if (!requireNamespace('invgamma', quietly = TRUE)) {
-    stop('Package \'invgamma\' is required for this function; if you install that package you can run this function.', call. = FALSE) }
+  requireInvgamma()
   
   #Check inputs
   if (!is.numeric(shape))   { stop('Error: shape should be numeric') }
