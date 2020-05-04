@@ -118,9 +118,7 @@ HDR.invexp <- function(cover.prob, rate = 1,
 HDR.betapr <- function(cover.prob, shape1, shape2, scale = 1,
                        gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
-  #Check for required package
-  if (!requireNamespace('extraDistr', quietly = TRUE)) {
-    stop('Package \'extraDistr\' is required for this function; if you install that package you can run this function.', call. = FALSE) }
+  requireExtraDist()
   
   #Check inputs
   if (!is.numeric(shape1))  { stop('Error: shape1 should be numeric') }

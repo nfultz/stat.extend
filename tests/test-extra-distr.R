@@ -14,3 +14,16 @@ stopifnot(all.equal(
   structure(list(list(l = 0.224157477631746, r = 1.49184317616973, 
                     lc = TRUE, rc = TRUE)), class = c("hdr", "interval"), domain = "R", method = "Computed using nlm optimisation with 11 iterations (code = 1)", probability = 0.5, distribution = "inverse gamma distribution with shape = 1 and scale = 1")
 ))
+
+
+stopifnot(all.equal(
+  stat.extend::HDR.betapr(.5, shape1=1, shape2=4),
+  structure(list(list(l = 0, r = 0.189207115002721, lc = TRUE, 
+                      rc = TRUE)), class = c("hdr", "interval"), domain = "R", method = "Computed using monotone optimisation", probability = 0.5, distribution = "beta prime distribution with shape1 = 1 and shape2 = 4")
+))
+
+stopifnot(all.equal(
+  stat.extend::HDR.betapr(.5, shape1=2, shape2=4),
+  structure(list(list(l = 0.0649354493196968, r = 0.492937442908933, 
+                      lc = TRUE, rc = TRUE)), class = c("hdr", "interval"), domain = "R", method = "Computed using nlm optimisation with 10 iterations (code = 1)", probability = 0.5, distribution = "beta prime distribution with shape1 = 2 and shape2 = 4")
+))
