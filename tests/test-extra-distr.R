@@ -27,3 +27,9 @@ stopifnot(all.equal(
   structure(list(list(l = 0.0649354493196968, r = 0.492937442908933, 
                       lc = TRUE, rc = TRUE)), class = c("hdr", "interval"), domain = "R", method = "Computed using nlm optimisation with 10 iterations (code = 1)", probability = 0.5, distribution = "beta prime distribution with shape1 = 2 and shape2 = 4")
 ))
+
+stopifnot(all.equal(
+  stat::extend::HDR.benini(.5, 1, 1)
+  structure(list(list(l = 1.24098584574423, r = 2.43041994178578, 
+                      lc = TRUE, rc = TRUE)), class = c("hdr", "interval"), domain = "R", method = "Computed using nlm optimisation with 9 iterations (code = 1)", probability = 0.5, distribution = "Benini distribution with shape = 1 and scale = 1")
+))
