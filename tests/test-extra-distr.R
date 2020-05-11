@@ -29,7 +29,14 @@ stopifnot(all.equal(
 ))
 
 stopifnot(all.equal(
-  stat::extend::HDR.benini(.5, 1, 1)
+  stat.extend::HDR.benini(.5, 1, 1),
   structure(list(list(l = 1.24098584574423, r = 2.43041994178578, 
                       lc = TRUE, rc = TRUE)), class = c("hdr", "interval"), domain = "R", method = "Computed using nlm optimisation with 9 iterations (code = 1)", probability = 0.5, distribution = "Benini distribution with shape = 1 and scale = 1")
+))
+
+
+stopifnot(all.equal(
+  stat.extend::HDR.fatigue(.5, alpha=3, beta=2, mu=1),
+  structure(list(list(l = 1.01685734320788, r = 3.00239281275403, 
+                      lc = TRUE, rc = TRUE)), class = c("hdr", "interval"), domain = "R", method = "Computed using nlm optimisation with 10 iterations (code = 1)", probability = 0.5, distribution = "fatigue-life (Birnbaum-Saunders) distribution with shape = 3, scale = 2 and location = 1")
 ))
