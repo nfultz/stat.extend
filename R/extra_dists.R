@@ -198,7 +198,7 @@ HDR.fatigue <- function(cover.prob, alpha, beta = 1, mu = 0,
   if (length(mu) != 1)      { stop('Error: mu should be a single value'); }
   
   #Set text for distribution
-  DIST <- ifelse(((location == 0)&(scale == 1)), 
+  DIST <- ifelse(((mu == 0)&(beta == 1)), 
                  paste0('standard fatigue-life (Birnbaum-Saunders) distribution with shape = ', alpha),
                  paste0('fatigue-life (Birnbaum-Saunders) distribution with shape = ', alpha, ', scale = ', beta, ' and location = ', mu));
   
