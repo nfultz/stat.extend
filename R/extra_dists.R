@@ -213,7 +213,7 @@ HDR.fatigue <- function(cover.prob, alpha, beta = 1, mu = 0,
   
   HDR; }
 
-
+#' @HDR
 HDR.gpd <- function(cover.prob, mu = 0, sigma = 1, xi = 0,
                     location = mu, scale = sigma, shape = xi, 
                     gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
@@ -243,7 +243,7 @@ HDR.gpd <- function(cover.prob, mu = 0, sigma = 1, xi = 0,
     
   HDR; }
 
-
+#' @HDR
 HDR.gompertz <- function(cover.prob, shape = 1, scale = 1, 
                          gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   

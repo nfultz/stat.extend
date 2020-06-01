@@ -38,7 +38,11 @@
 #'   HDR.invexp  \tab rate     \tab        \tab       \cr
 #'   HDR.betapr  \tab shape1   \tab shape2 \tab scale \cr
 #'   HDR.benini  \tab shape    \tab y0     \tab scale \cr
-#'   HDR.fatigue \tab alpha    \tab beta   \tab mu
+#'   HDR.fatigue \tab alpha    \tab beta   \tab mu    \cr
+#'   HDR.gpd     \tab mu,location\tab sigma, scale\tab shape, xi\cr
+#'   HDR.gompertz\tab shape    \tab scale  \tab       \cr
+#'   HDR.huber   \tab mu       \tab sigma  \tab epsilon \cr
+#'   
 #'   }
 #'
 #' The table above shows the parameters in each of the distributions.  Some have default values, but most need to be specified.  (For the gamma
