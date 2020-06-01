@@ -33,7 +33,12 @@
 #'   HDR.invchisq\tab df       \tab ncp    \tab       \cr
 #'   HDR.invgamma\tab shape    \tab rate   \tab scale \cr
 #'   HDR.invexp  \tab rate     \tab        \tab       \cr
-#'   
+#'   HDR.invchisq\tab df       \tab ncp    \tab       \cr
+#'   HDR.invgamma\tab shape    \tab rate   \tab scale \cr
+#'   HDR.invexp  \tab rate     \tab        \tab       \cr
+#'   HDR.betapr  \tab shape1   \tab shape2 \tab scale \cr
+#'   HDR.benini  \tab shape    \tab y0     \tab scale \cr
+#'   HDR.fatigue \tab alpha    \tab beta   \tab mu
 #'   }
 #'
 #' The table above shows the parameters in each of the distributions.  Some have default values, but most need to be specified.  (For the gamma
