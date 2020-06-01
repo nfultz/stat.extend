@@ -28,7 +28,7 @@ HDR.arcsine <- function(cover.prob, min = 0, max = 1,
 
 
 
-
+#' @rdname HDR
 HDR.invchisq <- function(cover.prob, df, ncp = 0,
                          gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
@@ -57,7 +57,7 @@ HDR.invchisq <- function(cover.prob, df, ncp = 0,
   HDR; }
 ##############################################3
 
-
+#' @rdname HDR
 HDR.invgamma <- function(cover.prob, shape, rate = 1, scale = 1/rate,
                          gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
@@ -90,7 +90,7 @@ HDR.invgamma <- function(cover.prob, shape, rate = 1, scale = 1/rate,
   
   HDR; }
 
-
+#' @HDR
 HDR.invexp <- function(cover.prob, rate = 1,
                        gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
@@ -114,7 +114,7 @@ HDR.invexp <- function(cover.prob, rate = 1,
   
   HDR; }
 
-
+#' @HDR
 HDR.betapr <- function(cover.prob, shape1, shape2, scale = 1,
                        gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
@@ -151,6 +151,7 @@ HDR.betapr <- function(cover.prob, shape1, shape2, scale = 1,
 
 ###################################################3
 
+#' @HDR
 HDR.benini <- function(cover.prob, shape, y0, scale = y0,
                        gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
@@ -180,6 +181,7 @@ HDR.benini <- function(cover.prob, shape, y0, scale = y0,
 
 #################################
 
+#' @HDR
 HDR.fatigue <- function(cover.prob, alpha, beta = 1, mu = 0, 
                         gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
