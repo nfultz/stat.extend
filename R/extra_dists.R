@@ -155,9 +155,7 @@ HDR.betapr <- function(cover.prob, shape1, shape2, scale = 1,
 HDR.benini <- function(cover.prob, shape, y0, scale = y0,
                        gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
-  #Check for required package
-  if (!requireNamespace('VGAM', quietly = TRUE)) {
-    stop('Package \'VGAM\' is required for this function; if you install that package you can run this function.', call. = FALSE) }
+  requireVGAM()
   
   #Check inputs
   if (!is.numeric(shape))   { stop('Error: shape should be numeric') }
@@ -185,9 +183,7 @@ HDR.benini <- function(cover.prob, shape, y0, scale = y0,
 HDR.fatigue <- function(cover.prob, alpha, beta = 1, mu = 0, 
                         gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
-  #Check for required package
-  if (!requireNamespace('extraDistr', quietly = TRUE)) {
-    stop('Package \'extraDistr\' is required for this function; if you install that package you can run this function.', call. = FALSE) }
+  requireExtraDist()
   
   #Check inputs
   if (!is.numeric(alpha))   { stop('Error: alpha should be numeric') }
@@ -218,9 +214,7 @@ HDR.gpd <- function(cover.prob, mu = 0, sigma = 1, xi = 0,
                     location = mu, scale = sigma, shape = xi, 
                     gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
-  #Check for required package
-  if (!requireNamespace('extraDistr', quietly = TRUE)) {
-    stop('Package \'extraDistr\' is required for this function; if you install that package you can run this function.', call. = FALSE) }
+  requireExtraDist()
   
   #Check inputs
   if (!is.numeric(location))      { stop('Error: location should be numeric') }
@@ -247,9 +241,7 @@ HDR.gpd <- function(cover.prob, mu = 0, sigma = 1, xi = 0,
 HDR.gompertz <- function(cover.prob, shape = 1, scale = 1, 
                          gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
-  #Check for required package
-  if (!requireNamespace('extraDistr', quietly = TRUE)) {
-    stop('Package \'extraDistr\' is required for this function; if you install that package you can run this function.', call. = FALSE) }
+  requireExtraDist()
   
   #Check inputs
   if (!is.numeric(shape))   { stop('Error: shape should be numeric') }
@@ -272,13 +264,11 @@ HDR.gompertz <- function(cover.prob, shape = 1, scale = 1,
   
   HDR; }
 
-
+#' @HDR
 HDR.huber <- function(cover.prob, mu, sigma, epsilon, 
                       gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
-  #Check for required package
-  if (!requireNamespace('extraDistr', quietly = TRUE)) {
-    stop('Package \'extraDistr\' is required for this function; if you install that package you can run this function.', call. = FALSE) }
+  requireExtraDist()
   
   #Check inputs
   if (!is.numeric(mu))      { stop('Error: mu should be numeric') }
@@ -310,13 +300,11 @@ HDR.huber <- function(cover.prob, mu, sigma, epsilon,
   
   HDR; }
 
-
+#' @HDR
 HDR.kumar <- function(cover.prob, a = 1, b = 1, shape1 = a, shape2 = b, 
                       gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
-  #Check for required package
-  if (!requireNamespace('extraDistr', quietly = TRUE)) {
-    stop('Package \'extraDistr\' is required for this function; if you install that package you can run this function.', call. = FALSE) }
+  requireExtraDist()
   
   #Check inputs
   if (!is.numeric(shape1))  { stop('Error: shape1 should be numeric') }
@@ -368,13 +356,11 @@ HDR.kumar <- function(cover.prob, a = 1, b = 1, shape1 = a, shape2 = b,
 
   HDR; }
 
-
+#' @rdname HDR
 HDR.frechet <- function(cover.prob, shape, scale = 1, location = 0,
                         gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
-  #Check for required package
-  if (!requireNamespace('VGAM', quietly = TRUE)) {
-    stop('Package \'VGAM\' is required for this function; if you install that package you can run this function.', call. = FALSE) }
+  requireVGAM()
   
   #Check inputs
   if (!is.numeric(shape))    { stop('Error: shape should be numeric') }
@@ -401,7 +387,7 @@ HDR.frechet <- function(cover.prob, shape, scale = 1, location = 0,
   
   HDR; }
 
-
+#' @rdname HDR
 HDR.gumbelII <- function(cover.prob, shape, scale = 1,
                          gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
@@ -430,7 +416,7 @@ HDR.gumbelII <- function(cover.prob, shape, scale = 1,
   
   HDR; }
 
-
+#' @rdname HDR
 HDR.lgamma <- function(cover.prob, shape = 1, scale = 1, location = 0,
                        gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
