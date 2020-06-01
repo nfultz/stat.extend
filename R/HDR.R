@@ -42,7 +42,10 @@
 #'   HDR.gpd     \tab mu,location\tab sigma, scale\tab shape, xi\cr
 #'   HDR.gompertz\tab shape    \tab scale  \tab       \cr
 #'   HDR.huber   \tab mu       \tab sigma  \tab epsilon \cr
-#'   
+#'   HDR.kumar   \tab a,shape2 \tab b,shape2 \tab     \cr
+#'   HDR.frechet \tab shape    \tab scale  \tab location\cr
+#'   HDR.gumbelII\tab shape    \tab scale  \tab       \cr
+#'   HDR.lgamma  \tab shape    \tab scale  \tab location\cr
 #'   }
 #'
 #' The table above shows the parameters in each of the distributions.  Some have default values, but most need to be specified.  (For the gamma
