@@ -1,4 +1,3 @@
-stat.extend:::requireExtraDistr()
 
 stopifnot(all.equal(
   stat.extend::HDR.invchisq(.5, 10, 0),

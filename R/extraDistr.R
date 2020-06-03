@@ -174,10 +174,10 @@ HDR.kumar <- function(cover.prob, a = 1, b = 1, shape1 = a, shape2 = b,
   #Check inputs
   if (!is.numeric(shape1))  { stop('Error: shape1 should be numeric') }
   if (length(shape1) != 1)  { stop('Error: shape1 should be a single value'); }
-  if (shape1 < 0)           { stop('Error: shape1 is negative'); }
+  if (shape1 <= 0)           { stop('Error: shape1 is negative'); }
   if (!is.numeric(shape2))  { stop('Error: shape2 should be numeric') }
   if (length(shape2) != 1)  { stop('Error: shape2 should be a single value'); }
-  if (shape2 < 0)           { stop('Error: shape2 is negative'); }
+  if (shape2 <= 0)           { stop('Error: shape2 is negative'); }
   
   #Set text for distribution
   DIST <- ifelse(((shape1 == 1)&(shape2 == 1)), 
@@ -209,7 +209,7 @@ HDR.kumar <- function(cover.prob, a = 1, b = 1, shape1 = a, shape2 = b,
   }
   
   #Compute HDR in bimodal case
-  if ((shape1 < 1) && (shape2 < 1)) {
+  if ((shape1 <= 1) && (shape2 <= 1)) {
     modality <- bimodal
   }
   

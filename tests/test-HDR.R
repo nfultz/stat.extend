@@ -1,9 +1,16 @@
 
+stopifnot(all.equal(
+  stat.extend::HDR.arcsine(.5, 0, 1), # should match beta(.5, .5)
+  structure(list(list(l = 0, r = 0.146446609406726, lc = TRUE, 
+                      rc = TRUE), list(l = 0.853553390593274, r = 1, lc = TRUE, 
+                                       rc = TRUE)), class = c("hdr", "interval"), domain = "R", method = "Computed using nlm optimisation with 0 iterations (code = 1)", probability = 0.5, distribution = "standard arcsine distribution")
+))
 
 stopifnot(all.equal(
-  stat.extend::HDR.norm(1-.05,1,3),
-  structure(list(list(l = -4.87989195362016, r = 6.87989195362016, 
-                      lc = TRUE, rc = TRUE)), class = c("hdr", "interval"), domain = "R", method = "Computed using nlm optimisation with 0 iterations (code = 1)", probability = 0.95, distribution = "normal distribution with mean = 1 and standard deviation = 3")
+  stat.extend::HDR.cauchy(1-.05, 1, 2),
+  structure(list(list(l = -24.4124094723494, r = 26.4124094723493, 
+                      lc = TRUE, rc = TRUE)), class = c("hdr", "interval"), domain = "R", method = "Computed using nlm optimisation with 0 iterations (code = 1)", probability = 0.95, distribution = "Cauchy distribution with location = 1 and scale = 2")
+  
 ))
 
 
@@ -15,18 +22,19 @@ stopifnot(all.equal(
 
 
 stopifnot(all.equal(
+  stat.extend::HDR.norm(1-.05,1,3),
+  structure(list(list(l = -4.87989195362016, r = 6.87989195362016, 
+                      lc = TRUE, rc = TRUE)), class = c("hdr", "interval"), domain = "R", method = "Computed using nlm optimisation with 0 iterations (code = 1)", probability = 0.95, distribution = "normal distribution with mean = 1 and standard deviation = 3")
+))
+
+
+stopifnot(all.equal(
   stat.extend::HDR.t(1-.05, 29, .3),
   structure(list(list(l = -1.73385540922536, r = 2.35964477149638, 
                       lc = TRUE, rc = TRUE)), class = c("hdr", "interval"), domain = "R", method = "Computed using nlm optimisation with 4 iterations (code = 1)", probability = 0.95, distribution = "Student's T distribution with 29 degrees-of-freedom and non-centrality parameter = 0.3")
 ))
 
 
-stopifnot(all.equal(
-  stat.extend::HDR.cauchy(1-.05, 1, 2),
-  structure(list(list(l = -24.4124094723494, r = 26.4124094723493, 
-                      lc = TRUE, rc = TRUE)), class = c("hdr", "interval"), domain = "R", method = "Computed using nlm optimisation with 0 iterations (code = 1)", probability = 0.95, distribution = "Cauchy distribution with location = 1 and scale = 2")
-  
-))
 
 
 # monotone
