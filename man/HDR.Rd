@@ -322,7 +322,7 @@ HDR.lgamma(
 
 \item{iterlim}{Parameter for the nlm optimisation - a positive integer specifying the maximum number of iterations to be performed before the program is terminated (see [\code{nlm} doccumentation](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/nlm.html)).}
 
-\item{shape1, shape2, ncp, location, scale, df, rate, df1, df2, meanlog, sdlog, mean, sd, min, max, shape, size, prob, m, n, k, mu, lambda}{Distribution parameters.}
+\item{shape1, shape2, ncp, location, scale, df, rate, df1, df2, meanlog, sdlog, mean, sd, min, max, shape, size, prob, m, n, k, mu, lambda, alpha, beta, sigma, xi, epsilon, a, b, y0, d}{Distribution parameters.}
 }
 \value{
 An interval object with classes \code{hdr} and \code{interval} containing the highest density region and related information.
@@ -388,5 +388,5 @@ The table above shows the parameters in each of the distributions.  Some have de
 distribution you should specify either the \code{rate} or \code{scale} but not both.)
 }
 \examples{
-HDR.norm(.05)
+HDR.norm(.95)
 }

@@ -28,7 +28,7 @@ hdr <- function(cover.prob, modality, Q, distribution, ...) {
   HDR;
 }
 
-
+# f is not used below, but needed to capture for distributions that switch modalities by param 
 monotone <- function(cover.prob, Q, f=NULL, decreasing = TRUE, ...) {
   Q <- partial(Q, ...);
 
