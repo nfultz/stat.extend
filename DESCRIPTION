@@ -1,18 +1,17 @@
 Package: stat.extend
 Type: Package
-Title: Add functions for distributions in the stats package
+Title: Highest Density Regions, Confidence Intervals with Finite Population Corrections, and Other Functions of Probability Distributions
 Version: 0.1.0
-Date: 9 January 2020
-Authors@R: person("Ben", "O'Neill", email = "ben.oneill@hotmail.com", role = c("aut", "cre"))
-           person("Neal", "Fultz", email = "nfultz@gmail.com", role = c("cre","ctb"))
-Author: Ben O'Neill [aut], Neal Fultz [ctb, cre]
-Maintainer: Neal Fultz <nfultz@gmail.com>
+Date: 2020 June 1
+Authors@R: c(
+    person("Ben", "O'Neill", email = "ben.oneill@hotmail.com", role = c("aut")),
+    person("Neal", "Fultz", email = "nfultz@gmail.com", role = c("cre","ctb"))
+    )
 Description: This package adds a HDR function for dealing with probability distributions in the stats package.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 
-    matrixStats,
     sets
 Suggests:
     extraDistr,
