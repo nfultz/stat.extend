@@ -445,7 +445,7 @@ HDR.lgamma <- function(cover.prob, shape = 1, scale = 1, location = 0,
   
   HDR; }
 
-
+#' @rdname HDR
 HDR.gengamma <- function(cover.prob, d, shape1 = d, k, shape2 = k,
                          rate = 1, scale = 1/rate,
                          gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
@@ -489,7 +489,7 @@ HDR.gengamma <- function(cover.prob, d, shape1 = d, k, shape2 = k,
   
   HDR; }
 
-
+#' @rdname HDR
 HDR.tnorm <- function(cover.prob, mean = 0, sd = 1, 
                       a = -Inf, b = Inf, min = a, max = b,
                       gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {

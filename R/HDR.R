@@ -12,6 +12,7 @@
 #' is done by optimisation using the \code{nlm} function.
 #'
 #' \tabular{lccc}{
+#'   Base distributions \tab   \tab        \tab       \cr
 #'   HDR.beta    \tab shape1   \tab shape2 \tab ncp   \cr
 #'   HDR.cauchy  \tab location \tab scale  \tab       \cr
 #'   HDR.chisq   \tab df       \tab ncp    \tab       \cr
@@ -46,6 +47,9 @@
 #'   HDR.frechet \tab shape    \tab scale  \tab location\cr
 #'   HDR.gumbelII\tab shape    \tab scale  \tab       \cr
 #'   HDR.lgamma  \tab shape    \tab scale  \tab location\cr
+#'   HDR.gengamma\tab  d, shape1 \tab, k, shape2 \tab rate, scale \cr
+#'   HDR.tnorm   \tab mean     \tab sd     \tab a, b, min, max \cr
+#'   
 #'   }
 #'
 #' The table above shows the parameters in each of the distributions.  Some have default values, but most need to be specified.  (For the gamma
