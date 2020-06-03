@@ -29,14 +29,12 @@
 #'   HDR.hyper   \tab m        \tab n      \tab k     \cr
 #'   HDR.nbinom  \tab size     \tab prob   \tab mu    \cr
 #'   HDR.pois    \tab lambda   \tab        \tab       \cr 
-#'   
 #'   HDR.arcsine \tab min      \tab max    \tab       \cr
+#'   Using \code{invgamma} \tab \tab       \tab       \cr
 #'   HDR.invchisq\tab df       \tab ncp    \tab       \cr
-#'   HDR.invgamma\tab shape    \tab rate   \tab scale \cr
 #'   HDR.invexp  \tab rate     \tab        \tab       \cr
-#'   HDR.invchisq\tab df       \tab ncp    \tab       \cr
 #'   HDR.invgamma\tab shape    \tab rate   \tab scale \cr
-#'   HDR.invexp  \tab rate     \tab        \tab       \cr
+#'   Using \code{extraDistr} \tab \tab       \tab       \cr
 #'   HDR.betapr  \tab shape1   \tab shape2 \tab scale \cr
 #'   HDR.benini  \tab shape    \tab y0     \tab scale \cr
 #'   HDR.fatigue \tab alpha    \tab beta   \tab mu    \cr

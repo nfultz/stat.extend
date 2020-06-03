@@ -32,7 +32,30 @@ HDR.invchisq <- function(cover.prob, df, ncp = 0,
              gradtol = gradtol, steptol = steptol, iterlim = iterlim);
   
   HDR; }
-##############################################3
+
+#' @HDR
+HDR.invexp <- function(cover.prob, rate = 1,
+                       gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
+  
+  requireInvgamma
+  
+  #Check inputs
+  if (!is.numeric(rate))    { stop('Error: rate should be numeric') }
+  if (length(rate) != 1)    { stop('Error: rate should be a single value'); }
+  if (rate < 0)             { stop('Error: rate is negative'); }
+  
+  #Set text for distribution
+  DIST <- paste0('inverse exponential distribution with rate = ', rate);
+  
+  #Compute HDR
+  HDR <- hdr(cover.prob, modality = unimodal, Q = invgamma::qinvexp, f = invgamma::dinvexp,
+             distribution = DIST,
+             rate=rate,
+             gradtol = gradtol, steptol = steptol, iterlim = iterlim);
+  
+  HDR; }
+
+
 
 #' @rdname HDR
 HDR.invgamma <- function(cover.prob, shape, rate = 1, scale = 1/rate,
@@ -63,30 +86,6 @@ HDR.invgamma <- function(cover.prob, shape, rate = 1, scale = 1/rate,
   HDR <- hdr(cover.prob, modality = unimodal, Q = invgamma::qinvgamma, f = invgamma::dinvgamma,
              distribution = DIST,
              shape = shape, scale = scale,
-             gradtol = gradtol, steptol = steptol, iterlim = iterlim);
-  
-  HDR; }
-
-#' @HDR
-HDR.invexp <- function(cover.prob, rate = 1,
-                       gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
-  
-  #Check for required package
-  if (!requireNamespace('invgamma', quietly = TRUE)) {
-    stop('Package \'invgamma\' is required for this function; if you install that package you can run this function.', call. = FALSE) }
-  
-  #Check inputs
-  if (!is.numeric(rate))    { stop('Error: rate should be numeric') }
-  if (length(rate) != 1)    { stop('Error: rate should be a single value'); }
-  if (rate < 0)             { stop('Error: rate is negative'); }
-  
-  #Set text for distribution
-  DIST <- paste0('inverse exponential distribution with rate = ', rate);
-  
-  #Compute HDR
-  HDR <- hdr(cover.prob, modality = unimodal, Q = invgamma::qinvexp, f = invgamma::dinvexp,
-             distribution = DIST,
-             rate=rate,
              gradtol = gradtol, steptol = steptol, iterlim = iterlim);
   
   HDR; }
