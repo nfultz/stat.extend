@@ -526,6 +526,35 @@ HDR.nbinom <- function(cover.prob, size, prob, mu,
            #size = size, prob = prob, mu = mu,
            gradtol = gradtol, steptol = steptol, iterlim = iterlim); }
 
+#' @rdname HDR
+HDR.arcsine <- function(cover.prob, min = 0, max = 1,
+                        gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
+  
+  #Check inputs
+  if (!is.numeric(min))     { stop('Error: min should be numeric') }
+  if (length(min) != 1)     { stop('Error: min should be a single value'); }
+  if (!is.numeric(max))     { stop('Error: max should be numeric') }
+  if (length(max) != 1)     { stop('Error: max should be a single value'); }
+  if (min > max)            { stop('Error: min is larger than max'); }
+  
+  
+  #Set text for distribution
+  DIST <- ifelse(((min == 0)&(max == 1)),
+                 'standard arcsine distribution',
+                 paste0('arcsine distribution with minimum = ', min, 
+                        ' and maximum = ', max));
+  
+  #Compute HDR using beta(1/2, 1/2) distribution
+  
+  betaHDR <- hdr(cover.prob, modality=bimodal, Q = qbeta, f = dbeta, distribution = DIST,
+                 shape1 = 1/2, shape2 = 1/2,
+                 gradtol = gradtol, steptol = steptol, iterlim = iterlim);
+  
+  
+  betaHDR[] <- (max-min)*betaHDR + min; 
+  betaHDR}
+
+
 #' @export
 print.hdr <- function(x, ...) {
 
