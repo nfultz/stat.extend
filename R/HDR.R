@@ -33,12 +33,8 @@
 #'   HDR.nbinom  \tab size     \tab prob   \tab mu    \cr
 #'   HDR.pois    \tab lambda   \tab        \tab       \cr 
 #'    \tab     \tab   \tab       \cr
-#'   Using \code{invgamma} \tab \tab       \tab       \cr
-#'   HDR.invchisq\tab df       \tab ncp    \tab       \cr
-#'   HDR.invexp  \tab rate     \tab        \tab       \cr
-#'   HDR.invgamma\tab shape    \tab rate   \tab scale \cr
-#'    \tab     \tab   \tab       \cr
 #'   Using \code{extraDistr} \tab \tab     \tab       \cr
+#'   HDR.betapr  \tab shape1   \tab shape2 \tab scale \cr
 #'   HDR.fatigue \tab alpha    \tab beta   \tab mu    \cr
 #'   HDR.gompertz\tab shape    \tab scale  \tab       \cr
 #'   HDR.gpd     \tab mu,location\tab sigma, scale\tab shape, xi\cr
@@ -46,9 +42,13 @@
 #'   HDR.kumar   \tab a,shape2 \tab b,shape2 \tab     \cr
 #'   HDR.tnorm   \tab mean     \tab sd     \tab a, b, min, max \cr
 #'    \tab     \tab   \tab       \cr
+#'   Using \code{invgamma} \tab \tab       \tab       \cr
+#'   HDR.invchisq\tab df       \tab ncp    \tab       \cr
+#'   HDR.invexp  \tab rate     \tab        \tab       \cr
+#'   HDR.invgamma\tab shape    \tab rate   \tab scale \cr
+#'    \tab     \tab   \tab       \cr
 #'   Using \code{VGAM} \tab    \tab        \tab       \cr
 #'   HDR.benini  \tab shape    \tab y0     \tab scale \cr
-#'   HDR.betapr  \tab shape1   \tab shape2 \tab scale \cr
 #'   HDR.frechet \tab shape    \tab scale  \tab location\cr
 #'   HDR.gengamma\tab  d, shape1 \tab, k, shape2 \tab rate, scale \cr
 #'   HDR.gumbelII\tab shape    \tab scale  \tab       \cr
