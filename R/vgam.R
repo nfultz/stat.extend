@@ -52,7 +52,7 @@ HDR.frechet <- function(cover.prob, shape, scale = 1, location = 0,
   
   
   
-  HDR <- hdr(cover.prob, modality = uunimodal, Q = VGAM::qfrechet, f = VGAM::dfrechet,
+  HDR <- hdr(cover.prob, modality = unimodal, Q = VGAM::qfrechet, f = VGAM::dfrechet,
              distribution = DIST, 
              shape = shape, scale = scale, location = location,
              gradtol = gradtol, steptol = steptol, iterlim = iterlim);  
@@ -62,7 +62,7 @@ HDR.frechet <- function(cover.prob, shape, scale = 1, location = 0,
   HDR; }
 
 #' @rdname HDR
-HDR.gengamma <- function(cover.prob, d, shape1 = d, k, shape2 = k,
+HDR.gengamma <- function(cover.prob, d, k, shape1 = d, shape2 = k,
                          rate = 1, scale = 1/rate,
                          gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
@@ -97,7 +97,7 @@ HDR.gengamma <- function(cover.prob, d, shape1 = d, k, shape2 = k,
     modality <- unimodal 
   }
   
-  HDR <- hdr(cover.prob, modality = modality, Q = VGAM::qgengamma.stacy, f = VGAM::dgengamma.stacy,
+  HDR <- hdr(cover.prob, modality = modality, Q = VGAM::qgengamma.stacy, f = VGAM::dgengamma.stacy, decreasing=TRUE,
              distribution = DIST, 
              scale = scale, d = shape1, k = shape2,
              gradtol = gradtol, steptol = steptol, iterlim = iterlim);  
@@ -124,7 +124,7 @@ HDR.gumbelII <- function(cover.prob, shape, scale = 1,
                  ' and scale = ', scale);
   
   
-  HDR <- hdr(cover.prob, modality = uunimodal, Q = VGAM::qgumbelII, f = VGAM::dgumbelII,
+  HDR <- hdr(cover.prob, modality = unimodal, Q = VGAM::qgumbelII, f = VGAM::dgumbelII,
              distribution = DIST, 
              shape = shape, scale = scale,
              gradtol = gradtol, steptol = steptol, iterlim = iterlim);  
