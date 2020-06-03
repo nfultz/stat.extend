@@ -7,7 +7,7 @@ requireExtraDistr <- function() {
 
 
 
-#' @HDR
+#' @rdname HDR
 HDR.betapr <- function(cover.prob, shape1, shape2, scale = 1,
                        gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
@@ -42,9 +42,7 @@ HDR.betapr <- function(cover.prob, shape1, shape2, scale = 1,
   
   HDR; }
 
-###################################################3
-
-#' @HDR
+#' @rdname HDR
 HDR.fatigue <- function(cover.prob, alpha, beta = 1, mu = 0, 
                         gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
@@ -75,7 +73,7 @@ HDR.fatigue <- function(cover.prob, alpha, beta = 1, mu = 0,
   HDR; }
 
 
-#' @HDR
+#' @rdname HDR
 HDR.gompertz <- function(cover.prob, shape = 1, scale = 1, 
                          gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
@@ -103,7 +101,7 @@ HDR.gompertz <- function(cover.prob, shape = 1, scale = 1,
   HDR; }
 
 
-#' @HDR
+#' @rdname HDR
 HDR.gpd <- function(cover.prob, mu = 0, sigma = 1, xi = 0,
                     location = mu, scale = sigma, shape = xi, 
                     gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
@@ -131,7 +129,7 @@ HDR.gpd <- function(cover.prob, mu = 0, sigma = 1, xi = 0,
   
   HDR; }
 
-#' @HDR
+#' @rdname HDR
 HDR.huber <- function(cover.prob, mu, sigma, epsilon, 
                       gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
@@ -167,7 +165,7 @@ HDR.huber <- function(cover.prob, mu, sigma, epsilon,
   
   HDR; }
 
-#' @HDR
+#' @rdname HDR
 HDR.kumar <- function(cover.prob, a = 1, b = 1, shape1 = a, shape2 = b, 
                       gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   

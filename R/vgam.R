@@ -4,10 +4,7 @@ requireVGAM <- function(){
     stop('Package \'VGAM\' is required for this function; if you install that package you can run this function.', call. = FALSE) }
 }
 
-
-
-
-#' @HDR
+#' @rdname HDR
 HDR.benini <- function(cover.prob, shape, y0, scale = y0,
                        gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
@@ -32,7 +29,6 @@ HDR.benini <- function(cover.prob, shape, y0, scale = y0,
              gradtol = gradtol, steptol = steptol, iterlim = iterlim);
   
   HDR; }
-
 
 #' @rdname HDR
 HDR.frechet <- function(cover.prob, shape, scale = 1, location = 0,
@@ -64,10 +60,6 @@ HDR.frechet <- function(cover.prob, shape, scale = 1, location = 0,
   
   
   HDR; }
-
-
-
-
 
 #' @rdname HDR
 HDR.gengamma <- function(cover.prob, d, shape1 = d, k, shape2 = k,
@@ -139,8 +131,6 @@ HDR.gumbelII <- function(cover.prob, shape, scale = 1,
   
   
   HDR; }
-
-
 
 #' @rdname HDR
 HDR.lgamma <- function(cover.prob, shape = 1, scale = 1, location = 0,

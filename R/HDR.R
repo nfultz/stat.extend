@@ -25,16 +25,19 @@
 #'   HDR.t       \tab df       \tab ncp    \tab       \cr
 #'   HDR.unif    \tab min      \tab max    \tab       \cr
 #'   HDR.weibull \tab shape    \tab scale  \tab       \cr
+#'    \tab     \tab   \tab       \cr
 #'   Using \code{stats} \tab Discrete      \tab        \tab       \cr
 #'   HDR.binom   \tab size     \tab prob   \tab       \cr
 #'   HDR.geom    \tab prob     \tab        \tab       \cr
 #'   HDR.hyper   \tab m        \tab n      \tab k     \cr
 #'   HDR.nbinom  \tab size     \tab prob   \tab mu    \cr
 #'   HDR.pois    \tab lambda   \tab        \tab       \cr 
+#'    \tab     \tab   \tab       \cr
 #'   Using \code{invgamma} \tab \tab       \tab       \cr
 #'   HDR.invchisq\tab df       \tab ncp    \tab       \cr
 #'   HDR.invexp  \tab rate     \tab        \tab       \cr
 #'   HDR.invgamma\tab shape    \tab rate   \tab scale \cr
+#'    \tab     \tab   \tab       \cr
 #'   Using \code{extraDistr} \tab \tab     \tab       \cr
 #'   HDR.fatigue \tab alpha    \tab beta   \tab mu    \cr
 #'   HDR.gompertz\tab shape    \tab scale  \tab       \cr
@@ -42,13 +45,14 @@
 #'   HDR.huber   \tab mu       \tab sigma  \tab epsilon \cr
 #'   HDR.kumar   \tab a,shape2 \tab b,shape2 \tab     \cr
 #'   HDR.tnorm   \tab mean     \tab sd     \tab a, b, min, max \cr
+#'    \tab     \tab   \tab       \cr
 #'   Using \code{VGAM} \tab    \tab        \tab       \cr
-#'   HDR.betapr  \tab shape1   \tab shape2 \tab scale \cr
 #'   HDR.benini  \tab shape    \tab y0     \tab scale \cr
+#'   HDR.betapr  \tab shape1   \tab shape2 \tab scale \cr
 #'   HDR.frechet \tab shape    \tab scale  \tab location\cr
+#'   HDR.gengamma\tab  d, shape1 \tab, k, shape2 \tab rate, scale \cr
 #'   HDR.gumbelII\tab shape    \tab scale  \tab       \cr
 #'   HDR.lgamma  \tab shape    \tab scale  \tab location\cr
-#'   HDR.gengamma\tab  d, shape1 \tab, k, shape2 \tab rate, scale \cr
 #'   }
 #'
 #' The table above shows the parameters in each of the distributions.  Some have default values, but most need to be specified.  (For the gamma
