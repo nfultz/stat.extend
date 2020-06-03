@@ -33,11 +33,11 @@ HDR.invchisq <- function(cover.prob, df, ncp = 0,
   
   HDR; }
 
-#' @HDR
+#' @rdname HDR
 HDR.invexp <- function(cover.prob, rate = 1,
                        gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
-  requireInvgamma
+  requireInvgamma()
   
   #Check inputs
   if (!is.numeric(rate))    { stop('Error: rate should be numeric') }
