@@ -1,5 +1,9 @@
 exportPattern("^HDR[.]")
+export(CONF.mean)
+export(CONF.var)
+export(CONF.prop)
 S3method(print,hdr)
+S3method(print,ci)
 importFrom("stats", "dbeta", "dcauchy", "dexp", "df", "dgamma",
            "dlnorm", "dnorm", "dt", "dunif", "dweibull", "nlm",
            "pbinom", "pgeom", "phyper", "pnbinom", "ppois", "qbeta",
