@@ -46,9 +46,8 @@ stopifnot(all.equal(
 
 stopifnot(all.equal(
   stat.extend::HDR.kumar(.5, 1, 1),
-  structure(list(list(l = 0, r = 0.25, lc = TRUE, rc = TRUE), list(
-    l = 0.75, r = 1, lc = TRUE, rc = TRUE)), class = c("hdr", 
-                                                       "interval"), domain = "R", method = "Computed using nlm optimisation with 0 iterations (code = 1)", probability = 0.5, distribution = "uniform distribution")
+  structure(list(list(l = 0.25, r = 0.75, lc = TRUE, rc = TRUE)), class = c("hdr", 
+                                                                            "interval"), domain = "R", method = "Computed using nlm optimisation with 0 iterations (code = 1)", probability = 0.5, distribution = "uniform distribution")
 ))
 
 

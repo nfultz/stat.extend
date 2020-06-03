@@ -209,7 +209,7 @@ HDR.kumar <- function(cover.prob, a = 1, b = 1, shape1 = a, shape2 = b,
   }
   
   #Compute HDR in bimodal case
-  if ((shape1 <= 1) && (shape2 <= 1)) {
+  if ((shape1 < 1) && (shape2 < 1)) {
     modality <- bimodal
   }
   
