@@ -1,3 +1,35 @@
+#' Optimal Confidence Intervals for finite populations
+#' 
+#' The mean interval is built on a symmetric pivotal quantity so it is symmetric around the sample mean.  
+#' 
+#' The variance interval is built on a non-symmetric pivotal quantity, so it is optimised by taking the shortest possible confidence interval with the specified confidence level (see e.g., Tate and Klett 1959).  
+#' 
+#' The proportion interval uses the Wilson score interval (see e.g., Agresti and Coull 1998).
+#' 
+#' @param alpha alpha Numeric (probability) The significance level determining the confidence level for the interval (the confidence level is 1-alpha).
+#' @param x  Numeric (vector) The vector of sample data (in the CONF.prop function this must be binary data)
+#' 
+#' @param sample.mean Numeric (any) The sample mean of the data
+#' @param sample.variance Numeric (non-neg) The sample variance of the data
+#' 
+#' @param unsampled Logical (positive) Indicator of whether the user wants a confidence interval for the relevant parameter only for the unsampled part of the population (as opposed to the whole population)
+#' @param kurt Numeric (positive) The assumed kurtosis of the underlying distribution (must be at least one)
+#' 
+#' @param n Integer (positive) The sample size
+#' @param N Integer (positive) The population size (must be at least as large as the sample size)
+#'
+#' @inheritParams checkIterArgs 
+#' @examples 
+#' DATA <- c(17.772, 16.359, 15.734, 15.698, 16.042, 
+#' 15.527, 16.533, 15.385, 15.368, 18.603, 
+#' 15.036, 13.873, 14.329, 15.837, 14.189, 
+#' 15.398, 16.266, 12.970, 15.219, 16.444, 
+#' 11.049, 14.262);
+#' KURT <- 4.37559247659433 # moments::kurtosis(DATA);
+#' CONF.mean(alpha = 0.1, x = DATA, N = 3200, kurt = KURT);
+#' CONF.var(alpha = 0.1, x = DATA, N = 3200, kurt = KURT);
+#' CONF.prop(alpha = 0.1, x = DATA > 15, N = 3200);
+#'@rdname CONF
 CONF.mean <- function(alpha, x = NULL, sample.mean = mean(x), 
                       sample.variance = var(x), n = length(x),
                       N = Inf, kurt = 3, unsampled = FALSE,
@@ -48,16 +80,8 @@ CONF.mean <- function(alpha, x = NULL, sample.mean = mean(x),
   if (length(unsampled) != 1) { stop('Error: unsampled should be a single value'); }
   
   #Check inputs for nlm
-  if (!is.numeric(gradtol)) { stop('Error: gradtol should be numeric') }
-  if (length(gradtol) != 1) { stop('Error: gradtol should be a single value'); }
-  if (gradtol <= 0)         { stop('Error: gradtol should be positive'); }
-  if (!is.numeric(steptol)) { stop('Error: steptol should be numeric') }
-  if (length(steptol) != 1) { stop('Error: steptol should be a single value'); }
-  if (steptol <= 0)         { stop('Error: steptol should be positive'); }
-  if (!is.numeric(iterlim)) { stop('Error: iterlim should be numeric') }
-  if (length(iterlim) != 1) { stop('Error: iterlim should be a single value'); }
-  if (iterlim <= 0)         { stop('Error: iterlim should be positive'); }
-  
+  checkIterArgs(gradtol, steptol, iterlim)
+
   #############
   
   #Compute CONF
@@ -96,6 +120,7 @@ CONF.mean <- function(alpha, x = NULL, sample.mean = mean(x),
   
   CONF; }
 
+#'@rdname CONF
 CONF.var <- function(alpha, x = NULL, 
                      sample.variance = var(x), n = length(x), 
                      N = Inf, kurt = 3, unsampled = FALSE, 
@@ -271,6 +296,13 @@ CONF.var <- function(alpha, x = NULL,
   
   CONF; }
 
+
+
+
+
+
+#' @param sample.prop Numeric (probability) The sample proportion of the data (only for binary data)
+#' @rdname CONF
 CONF.prop <- function(alpha, x = NULL, 
                       sample.prop = mean(x), n = length(x),
                       N = Inf, unsampled = FALSE) {
@@ -293,6 +325,8 @@ CONF.prop <- function(alpha, x = NULL,
   #Check data inputs
   P <- sample.prop;
   if (!missing(x)) {
+    xexpr <- deparse(substitute(x));
+    if (is.logical(x)) x <- x + 0;
     if (!is.numeric(x))     { stop('Error: x should be numeric') }
     if (!all(x %in% c(0L,1L))) { stop('Error: x should be binary data') } }
   if (!is.numeric(P))       { stop('Error: sample proportion should be numeric') }
@@ -327,7 +361,7 @@ CONF.prop <- function(alpha, x = NULL,
                        ' binary data points with sample proportion = ', 
                        sprintf(P, fmt = '%#.4f')) } else {
                          DATADESC <- paste0('Interval uses ', n, ' binary data points from data ', 
-                                            deparse(substitute(x)), ' with sample proportion = ', 
+                                            xexpr, ' with sample proportion = ', 
                                             sprintf(P, fmt = '%#.4f')) }
   attr(CONF, 'data') <- DATADESC;
   
@@ -343,22 +377,22 @@ CONF.prop <- function(alpha, x = NULL,
   
   CONF; }
 
-print.ci <- function(object) {
+print.ci <- function(x, ...) {
   
   #Print description of confidence interval
   cat('\n        Confidence Interval (CI) \n \n');
-  cat(paste0(sprintf(100*attributes(object)$confidence, fmt = '%#.2f'), '%'),
-      'CI for', attributes(object)$parameter, '\n');
+  cat(paste0(sprintf(100*attributes(x)$confidence, fmt = '%#.2f'), '%'),
+      'CI for', attributes(x)$parameter, '\n');
   
   #Print data description
-  cat(attributes(object)$data, '\n');
+  cat(attributes(x)$data, '\n');
   
   #Print method
-  if (!is.na(attributes(object)$method)) {
-    cat(attributes(object)$method, '\n'); }
+  if (!is.na(attributes(x)$method)) {
+    cat(attributes(x)$method, '\n'); }
   
   #Print confidence interval
   cat('\n');
-  writeLines(as.character(c(object)))
-  invisible(c(object))
+  writeLines(as.character(c(x)))
+  invisible(c(x))
   cat('\n'); }

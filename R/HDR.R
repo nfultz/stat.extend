@@ -60,9 +60,7 @@
 #'
 #' @param cover.prob The probability coverage for the HDR (scalar between zero and one).  The significance level for the HDR i is \code{1-cover.prob}.  
 #' @param shape1,shape2,ncp,location,scale,df,rate,df1,df2,meanlog,sdlog,mean,sd,min,max,shape,size,prob,m,n,k,mu,lambda,alpha,beta,sigma,xi,epsilon,a,b,y0,d Distribution parameters.
-#' @param gradtol Parameter for the nlm optimisation - a positive scalar giving the tolerance at which the scaled gradient is considered close enough to zero to terminate the algorithm (see [\code{nlm} doccumentation](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/nlm.html)).
-#' @param steptol Parameter for the nlm optimisation - a positive scalar providing the minimum allowable relative step length (see [\code{nlm} doccumentation](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/nlm.html)).
-#' @param iterlim Parameter for the nlm optimisation - a positive integer specifying the maximum number of iterations to be performed before the program is terminated (see [\code{nlm} doccumentation](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/nlm.html)).
+#' @inheritParams checkIterArgs 
 #' @return An interval object with classes \code{hdr} and \code{interval} containing the highest density region and related information.
 #' @name HDR
 NULL
