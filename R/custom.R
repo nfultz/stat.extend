@@ -13,6 +13,9 @@ UNSPECIFIED_LABEL='an unspecified input distribution'
 #' @inheritParams checkIterArgs 
 #' @return An interval object with classes \code{hdr} and \code{interval} containing the highest density region and related information.
 #' 
+#' @examples 
+#' HDR.unimodal(.95, Q=qnorm)
+#' 
 #' @rdname custom
 HDR.monotone <- function(cover.prob, Q, decreasing = TRUE, distribution = UNSPECIFIED_LABEL, ...) {
   hdr(cover.prob = cover.prob, modality=monotone, Q=Q, distribution=distribution, decreasing=decreasing, ...)

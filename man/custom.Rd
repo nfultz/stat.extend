@@ -91,3 +91,7 @@ An interval object with classes \code{hdr} and \code{interval} containing the hi
 \description{
 Custom HDR Functions
 }
+\examples{
+HDR.unimodal(.95, Q=qnorm)
+
+}
