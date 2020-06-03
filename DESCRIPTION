@@ -14,4 +14,8 @@ LazyData: true
 Imports: 
     matrixStats,
     sets
+Suggests:
+    extradistr,
+    invgamma,
+    VGAM
 RoxygenNote: 7.0.2

@@ -1,124 +1,17 @@
-#' @rdname HDR
-HDR.arcsine <- function(cover.prob, min = 0, max = 1,
-                        gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
-  
-  #Check inputs
-  if (!is.numeric(min))     { stop('Error: min should be numeric') }
-  if (length(min) != 1)     { stop('Error: min should be a single value'); }
-  if (!is.numeric(max))     { stop('Error: max should be numeric') }
-  if (length(max) != 1)     { stop('Error: max should be a single value'); }
-  if (min > max)            { stop('Error: min is larger than max'); }
-  
 
-  #Set text for distribution
-  DIST <- ifelse(((min == 0)&(max == 1)),
-                 'standard arcsine distribution',
-                 paste0('arcsine distribution with minimum = ', min, 
-                        ' and maximum = ', max));
-  
-  #Compute HDR using beta(1/2, 1/2) distribution
-  
-  betaHDR <- hdr(cover.prob, modality=bimodal, Q = qbeta, f = dbeta, distribution = DIST,
-                 shape1 = 1/2, shape2 = 1/2,
-                 gradtol = gradtol, steptol = steptol, iterlim = iterlim);
-  
-    
-  betaHDR[] <- (max-min)*betaHDR + min; 
-  betaHDR}
-
-
-
-#' @rdname HDR
-HDR.invchisq <- function(cover.prob, df, ncp = 0,
-                         gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
-  
-  requireInvgamma()
-  
-  #Check inputs
-  if (!is.numeric(df))      { stop('Error: df should be numeric') }
-  if (length(df) != 1)      { stop('Error: df should be a single value'); }
-  if (df < 0)               { stop('Error: df is negative'); }
-  if (!is.numeric(ncp))     { stop('Error: ncp should be numeric') }
-  if (length(ncp) != 1)     { stop('Error: ncp should be a single value'); }
-  if (ncp < 0)              { stop('Error: ncp is negative'); }
-  
-  #Set text for distribution
-  DIST <- ifelse(ncp == 0,
-                 paste0('inverse chi-squared distribution with ', df, ' degrees-of-freedom'),
-                 paste0('inverse chi-squared distribution with ', df, 
-                        ' degrees-of-freedom and non-centrality parameter = ', ncp));
-  
-  #Compute HDR
-  HDR <- hdr(cover.prob, modality=unimodal, Q = invgamma::qinvchisq, f = invgamma::dinvchisq,
-             distribution = DIST,
-             df=df, ncp=ncp,
-             gradtol = gradtol, steptol = steptol, iterlim = iterlim);
-  
-  HDR; }
-##############################################3
-
-#' @rdname HDR
-HDR.invgamma <- function(cover.prob, shape, rate = 1, scale = 1/rate,
-                         gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
-  
-  requireInvgamma()
-  
-  #Check inputs
-  if (!is.numeric(shape))   { stop('Error: shape should be numeric') }
-  if (length(shape) != 1)   { stop('Error: shape should be a single value'); }
-  if (shape < 0)            { stop('Error: shape is negative'); }
-  if (!is.numeric(rate))    { stop('Error: rate should be numeric') }
-  if (length(rate) != 1)    { stop('Error: rate should be a single value'); }
-  if (rate < 0)             { stop('Error: rate is negative'); }
-  if ((!missing(rate) && !missing(scale))) {
-    if (abs(rate*scale - 1) < 1e-15) 
-      warning('specify rate or scale but not both') else
-        stop('Error: specify rate or scale but not both'); }
-  if (!is.numeric(scale))   { stop('Error: scale should be numeric') }
-  if (length(scale) != 1)   { stop('Error: scale should be a single value'); }
-  if (scale < 0)            { stop('Error: scale is negative'); }
-  
-  #Set text for distribution
-  DIST <- paste0('inverse gamma distribution with shape = ', shape,
-                 ' and scale = ', scale);
-  
-  #Compute HDR
-  HDR <- hdr(cover.prob, modality = unimodal, Q = invgamma::qinvgamma, f = invgamma::dinvgamma,
-             distribution = DIST,
-             shape = shape, scale = scale,
-             gradtol = gradtol, steptol = steptol, iterlim = iterlim);
-  
-  HDR; }
-
-#' @HDR
-HDR.invexp <- function(cover.prob, rate = 1,
-                       gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
-  
+requireExtraDistr <- function() {
   #Check for required package
-  if (!requireNamespace('invgamma', quietly = TRUE)) {
-    stop('Package \'invgamma\' is required for this function; if you install that package you can run this function.', call. = FALSE) }
-  
-  #Check inputs
-  if (!is.numeric(rate))    { stop('Error: rate should be numeric') }
-  if (length(rate) != 1)    { stop('Error: rate should be a single value'); }
-  if (rate < 0)             { stop('Error: rate is negative'); }
+  if (!requireNamespace('extraDistr', quietly = TRUE)) {
+    stop('Package \'extraDistr\' is required for this function; if you install that package you can run this function.', call. = FALSE) }
+}
 
-  #Set text for distribution
-  DIST <- paste0('inverse exponential distribution with rate = ', rate);
 
-  #Compute HDR
-  HDR <- hdr(cover.prob, modality = unimodal, Q = invgamma::qinvexp, f = invgamma::dinvexp,
-             distribution = DIST,
-             rate=rate,
-             gradtol = gradtol, steptol = steptol, iterlim = iterlim);
-  
-  HDR; }
 
 #' @HDR
 HDR.betapr <- function(cover.prob, shape1, shape2, scale = 1,
                        gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
-  requireExtraDist()
+  requireExtraDistr()
   
   #Check inputs
   if (!is.numeric(shape1))  { stop('Error: shape1 should be numeric') }
@@ -152,38 +45,10 @@ HDR.betapr <- function(cover.prob, shape1, shape2, scale = 1,
 ###################################################3
 
 #' @HDR
-HDR.benini <- function(cover.prob, shape, y0, scale = y0,
-                       gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
-  
-  requireVGAM()
-  
-  #Check inputs
-  if (!is.numeric(shape))   { stop('Error: shape should be numeric') }
-  if (length(shape) != 1)   { stop('Error: shape should be a single value'); }
-  if (shape < 0)            { stop('Error: shape is negative'); }
-  if (!is.numeric(scale))   { stop('Error: scale should be numeric') }
-  if (length(scale) != 1)   { stop('Error: scale should be a single value'); }
-  if (scale <= 0)           { stop('Error: scale should be positive'); }
-  
-  #Set text for distribution
-  DIST <- paste0('Benini distribution with shape = ', shape, 
-                 ' and scale = ', scale);
-  
-  #Compute HDR
-  HDR <- hdr(cover.prob, modality = unimodal, Q = VGAM::qbenini, f = VGAM::dbenini,
-             distribution = DIST,
-             y0=scale, shape=shape,
-             gradtol = gradtol, steptol = steptol, iterlim = iterlim);
-  
-  HDR; }
-
-#################################
-
-#' @HDR
 HDR.fatigue <- function(cover.prob, alpha, beta = 1, mu = 0, 
                         gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
-  requireExtraDist()
+  requireExtraDistr()
   
   #Check inputs
   if (!is.numeric(alpha))   { stop('Error: alpha should be numeric') }
@@ -209,39 +74,12 @@ HDR.fatigue <- function(cover.prob, alpha, beta = 1, mu = 0,
   
   HDR; }
 
-#' @HDR
-HDR.gpd <- function(cover.prob, mu = 0, sigma = 1, xi = 0,
-                    location = mu, scale = sigma, shape = xi, 
-                    gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
-  
-  requireExtraDist()
-  
-  #Check inputs
-  if (!is.numeric(location))      { stop('Error: location should be numeric') }
-  if (length(location) != 1) { stop('Error: location should be a single value'); }
-  if (!is.numeric(scale))   { stop('Error: scale should be numeric') }
-  if (length(scale) != 1)   { stop('Error: scale should be a single value'); }
-  if (scale <= 0)           { stop('Error: scale should be positive'); }
-  if (!is.numeric(shape))   { stop('Error: shape should be numeric') }
-  if (length(shape) != 1)   { stop('Error: shape should be a single value'); }
-  
-  #Set text for distribution
-  DIST <- paste0('generalised Pareto distribution with location = ', location,
-                 ', scale = ', scale, ' and shape = ', shape);
-
-
-  HDR <- hdr(cover.prob, modality = unimodal, Q = extraDistr::qgpd, f = extraDistr::dgpd,
-             distribution = DIST, decreasing = shape >= -1,
-             mu = location, sigma = scale, xi= shape,
-             gradtol = gradtol, steptol = steptol, iterlim = iterlim);  
-    
-  HDR; }
 
 #' @HDR
 HDR.gompertz <- function(cover.prob, shape = 1, scale = 1, 
                          gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
-  requireExtraDist()
+  requireExtraDistr()
   
   #Check inputs
   if (!is.numeric(shape))   { stop('Error: shape should be numeric') }
@@ -264,11 +102,40 @@ HDR.gompertz <- function(cover.prob, shape = 1, scale = 1,
   
   HDR; }
 
+
+#' @HDR
+HDR.gpd <- function(cover.prob, mu = 0, sigma = 1, xi = 0,
+                    location = mu, scale = sigma, shape = xi, 
+                    gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
+  
+  requireExtraDistr()
+  
+  #Check inputs
+  if (!is.numeric(location))      { stop('Error: location should be numeric') }
+  if (length(location) != 1) { stop('Error: location should be a single value'); }
+  if (!is.numeric(scale))   { stop('Error: scale should be numeric') }
+  if (length(scale) != 1)   { stop('Error: scale should be a single value'); }
+  if (scale <= 0)           { stop('Error: scale should be positive'); }
+  if (!is.numeric(shape))   { stop('Error: shape should be numeric') }
+  if (length(shape) != 1)   { stop('Error: shape should be a single value'); }
+  
+  #Set text for distribution
+  DIST <- paste0('generalised Pareto distribution with location = ', location,
+                 ', scale = ', scale, ' and shape = ', shape);
+  
+  
+  HDR <- hdr(cover.prob, modality = unimodal, Q = extraDistr::qgpd, f = extraDistr::dgpd,
+             distribution = DIST, decreasing = shape >= -1,
+             mu = location, sigma = scale, xi= shape,
+             gradtol = gradtol, steptol = steptol, iterlim = iterlim);  
+  
+  HDR; }
+
 #' @HDR
 HDR.huber <- function(cover.prob, mu, sigma, epsilon, 
                       gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
-  requireExtraDist()
+  requireExtraDistr()
   
   #Check inputs
   if (!is.numeric(mu))      { stop('Error: mu should be numeric') }
@@ -304,7 +171,7 @@ HDR.huber <- function(cover.prob, mu, sigma, epsilon,
 HDR.kumar <- function(cover.prob, a = 1, b = 1, shape1 = a, shape2 = b, 
                       gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
-  requireExtraDist()
+  requireExtraDistr()
   
   #Check inputs
   if (!is.numeric(shape1))  { stop('Error: shape1 should be numeric') }
@@ -356,145 +223,15 @@ HDR.kumar <- function(cover.prob, a = 1, b = 1, shape1 = a, shape2 = b,
 
   HDR; }
 
-#' @rdname HDR
-HDR.frechet <- function(cover.prob, shape, scale = 1, location = 0,
-                        gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
-  
-  requireVGAM()
-  
-  #Check inputs
-  if (!is.numeric(shape))    { stop('Error: shape should be numeric') }
-  if (length(shape) != 1)    { stop('Error: shape should be a single value'); }
-  if (shape < 0)             { stop('Error: shape is negative'); }
-  if (!is.numeric(scale))    { stop('Error: scale should be numeric') }
-  if (length(scale) != 1)    { stop('Error: scale should be a single value'); }
-  if (scale < 0)             { stop('Error: scale is negative'); }
-  if (!is.numeric(location)) { stop('Error: location should be numeric') }
-  if (length(location) != 1) { stop('Error: location should be a single value'); }
-  
-  #Set text for distribution
-  DIST <- paste0('Fréchet distribution with shape = ', shape,
-                 ', scale = ', scale, ' and location = ', location);
-  
-  
-  
-  HDR <- hdr(cover.prob, modality = uunimodal, Q = VGAM::qfrechet, f = VGAM::dfrechet,
-             distribution = DIST, 
-             shape = shape, scale = scale, location = location,
-             gradtol = gradtol, steptol = steptol, iterlim = iterlim);  
-  
-  
-  
-  HDR; }
 
-#' @rdname HDR
-HDR.gumbelII <- function(cover.prob, shape, scale = 1,
-                         gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
-  
-  #Check for required package
-  if (!requireNamespace('VGAM', quietly = TRUE)) {
-    stop('Package \'VGAM\' is required for this function; if you install that package you can run this function.', call. = FALSE) }
-  
-  #Check inputs
-  if (!is.numeric(shape))   { stop('Error: shape should be numeric') }
-  if (length(shape) != 1)   { stop('Error: shape should be a single value'); }
-  if (shape < 0)            { stop('Error: shape is negative'); }
-  if (!is.numeric(scale))   { stop('Error: scale should be numeric') }
-  if (length(scale) != 1)   { stop('Error: scale should be a single value'); }
-  if (scale < 0)            { stop('Error: scale is negative'); }
-  
-  #Set text for distribution
-  DIST <- paste0('Gumbel (Type II) distribution with shape = ', shape,
-                 ' and scale = ', scale);
-  
-  
-  HDR <- hdr(cover.prob, modality = uunimodal, Q = VGAM::qgumbelII, f = VGAM::dgumbelII,
-             distribution = DIST, 
-             shape = shape, scale = scale,
-             gradtol = gradtol, steptol = steptol, iterlim = iterlim);  
-  
-  
-  HDR; }
 
-#' @rdname HDR
-HDR.lgamma <- function(cover.prob, shape = 1, scale = 1, location = 0,
-                       gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
-  
-  requireVGAM()
-  
-  #Check inputs
-  if (!is.numeric(shape))   { stop('Error: shape should be numeric') }
-  if (length(shape) != 1)   { stop('Error: shape should be a single value'); }
-  if (shape < 0)            { stop('Error: shape is negative'); }
-  if (!is.numeric(scale))   { stop('Error: scale should be numeric') }
-  if (length(scale) != 1)   { stop('Error: scale should be a single value'); }
-  if (scale < 0)            { stop('Error: scale is negative'); }
-  if (!is.numeric(location)) { stop('Error: location should be numeric') }
-  if (length(location) != 1) { stop('Error: location should be a single value'); }
-  
-  #Set text for distribution
-  DIST <- paste0('log-gamma distribution with shape = ', shape,
-                 ', scale = ', scale, ' and location = ', location);
-  
-  HDR <- hdr(cover.prob, modality = unimodal, Q = VGAM::qlgamma, f = VGAM::dlgamma,
-             distribution = DIST, 
-             shape = shape, scale = scale, location = location,
-             gradtol = gradtol, steptol = steptol, iterlim = iterlim);  
-  
-  
-  
-  HDR; }
-
-#' @rdname HDR
-HDR.gengamma <- function(cover.prob, d, shape1 = d, k, shape2 = k,
-                         rate = 1, scale = 1/rate,
-                         gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
-  
-  requireVGAM()
-    
-  #Check inputs
-  if (!is.numeric(shape1))  { stop('Error: shape1 should be numeric') }
-  if (length(shape1) != 1)  { stop('Error: shape1 should be a single value'); }
-  if (shape1 < 0)           { stop('Error: shape1 is negative'); }
-  if (!is.numeric(shape2))  { stop('Error: shape2 should be numeric') }
-  if (length(shape2) != 1)  { stop('Error: shape2 should be a single value'); }
-  if (shape2 < 0)           { stop('Error: shape2 is negative'); }
-  if (!is.numeric(scale))   { stop('Error: scale should be numeric') }
-  if (length(scale) != 1)   { stop('Error: scale should be a single value'); }
-  if (scale < 0)            { stop('Error: scale is negative'); }
-  if (!is.numeric(rate))    { stop('Error: rate should be numeric') }
-  if (length(rate) != 1)    { stop('Error: rate should be a single value'); }
-  if (rate < 0)             { stop('Error: rate is negative'); }
-  if ((!missing(rate) && !missing(scale))) {
-    if (abs(rate*scale - 1) < 1e-15) 
-      warning('specify rate or scale but not both') else
-        stop('Error: specify rate or scale but not both'); }
-  
-  #Set text for distribution
-  DIST <- paste0('generalised gamma (Stacy) distribution with shape1 = ', shape1,
-                 ', shape2 = ', shape2, ' and scale = ', scale);
-  
-  #Compute HDR in monotone case
-  if (shape1 <= 1) {
-    modality <- monotone
-  } else if (shape1 > 1) {
-    modality <- unimodal 
-  }
-
-  HDR <- hdr(cover.prob, modality = modality, Q = VGAM::qgengamma.stacy, f = VGAM::dgengamma.stacy,
-             distribution = DIST, 
-             scale = scale, d = shape1, k = shape2,
-             gradtol = gradtol, steptol = steptol, iterlim = iterlim);  
-  
-  
-  HDR; }
 
 #' @rdname HDR
 HDR.tnorm <- function(cover.prob, mean = 0, sd = 1, 
                       a = -Inf, b = Inf, min = a, max = b,
                       gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
   
-  requireExtraDist()
+  requireExtraDistr()
   
   #Check inputs
   if (!is.numeric(mean))    { stop('Error: mean should be numeric') }
