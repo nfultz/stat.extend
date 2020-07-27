@@ -557,20 +557,23 @@ HDR.arcsine <- function(cover.prob, min = 0, max = 1,
 
 
 #' @export
-print.hdr <- function(x, ...) {
-
+print.hdr <- function(object) {
+  
   #Print description of HDR
   cat('\n        Highest Density Region (HDR) \n \n');
-  cat(paste0(sprintf(100*attributes(x)$probability, fmt = '%#.2f'), '%'),
-      'HDR for', attributes(x)$distribution, '\n');
-
+  cat(paste0(sprintf(100*attributes(object)$probability, fmt = '%#.2f'), '%'),
+      'HDR for', attributes(object)$distribution, '\n');
+  
   #Print method
-  if (!is.na(attributes(x)$method)) {
-    cat(attributes(x)$method, '\n'); }
-
+  if (!is.na(attributes(object)$method)) {
+    cat(attributes(object)$method, '\n'); }
+  
   #Print HDR interval
   cat('\n');
-  writeLines(as.character(c(x)))
-  cat('\n');
-  invisible(c(x)); }
-
+  if ('interval' %in% class(c(object))) { 
+    writeLines(as.character(c(object)))
+    invisible(c(object)) } else {
+      if ('set' %in% class(c(object))) { 
+        writeLines(capture.output(c(object)))
+        invisible(c(object)) } }
+  cat('\n'); }

@@ -43,6 +43,7 @@ HDR.bimodal(
 HDR.discrete.unimodal(
   cover.prob,
   Q,
+  F,
   f = NULL,
   u = NULL,
   distribution = UNSPECIFIED_LABEL,
@@ -67,7 +68,7 @@ HDR.discrete(
 \arguments{
 \item{cover.prob}{The probability coverage for the HDR (scalar between zero and one).  The significance level for the HDR i is \code{1-cover.prob}.}
 
-\item{Q}{a CDF of a distribution}
+\item{Q}{an inverse CDF of a distribution}
 
 \item{decreasing}{Direction of monotone distribution}
 
@@ -84,6 +85,8 @@ HDR.discrete(
 \item{steptol}{Parameter for the nlm optimisation - a positive scalar providing the minimum allowable relative step length (see [\code{nlm} doccumentation](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/nlm.html)).}
 
 \item{iterlim}{Parameter for the nlm optimisation - a positive integer specifying the maximum number of iterations to be performed before the program is terminated (see [\code{nlm} doccumentation](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/nlm.html)).}
+
+\item{F}{a CDF of a distribution}
 }
 \value{
 An interval object with classes \code{hdr} and \code{interval} containing the highest density region and related information.
@@ -92,6 +95,15 @@ An interval object with classes \code{hdr} and \code{interval} containing the hi
 Custom HDR Functions
 }
 \examples{
+
+HDR.monotone(.95, Q=qexp)
+
 HDR.unimodal(.95, Q=qnorm)
+
+HDR.bimodal(.95, Q=qbeta, shape1=1/2, shape2=1/2)
+
+HDR.discrete.unimodal(.95, Q=qpois, F=ppois, lambda=1)
+
+HDR.discrete(.95, Q=qpois, f=dpois, lambda=1)
 
 }
