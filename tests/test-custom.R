@@ -24,3 +24,14 @@ stopifnot(all.equal(
   stat.extend::HDR.discrete.unimodal(.95, Q=qpois, F=ppois, lambda=1)[1:2],
   stat.extend::HDR.pois(.95, 1)[1:2]
 ))
+
+# Below has 0 prob at 2; shall not throw an error.
+Q = function(p) ifelse(p <= .08, 1, ifelse(p <= .14, 3, ifelse(p <= .4, 4, 5)))
+f = function(x) c(.08, 0, .06, .26, .6)[floor(x)]
+
+stopifnot(inherits(  
+  stat.extend:::HDR.discrete(.95, Q, f),
+  "set"
+))
+
+

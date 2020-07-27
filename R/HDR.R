@@ -557,7 +557,9 @@ HDR.arcsine <- function(cover.prob, min = 0, max = 1,
 
 
 #' @export
-print.hdr <- function(object) {
+print.hdr <- function(x, ...) {
+  
+  object <- x
   
   #Print description of HDR
   cat('\n        Highest Density Region (HDR) \n \n');
@@ -574,6 +576,6 @@ print.hdr <- function(object) {
     writeLines(as.character(c(object)))
     invisible(c(object)) } else {
       if ('set' %in% class(c(object))) { 
-        writeLines(capture.output(c(object)))
+        writeLines(format(object))
         invisible(c(object)) } }
   cat('\n'); }
