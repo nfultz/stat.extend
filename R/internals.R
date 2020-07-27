@@ -21,7 +21,7 @@ hdr <- function(cover.prob, modality, Q, distribution, ...) {
     HDR <- modality(cover.prob=cover.prob, Q=Q, ...);}
 
   HDR <- structure(HDR,
-                   class = c('hdr','interval'),
+                   class = c('hdr',class(HDR)),
                    probability = attr(HDR, "probability") %||% cover.prob,
                    distribution = distribution);
 
@@ -197,7 +197,7 @@ discrete.unimodal <- function(cover.prob, Q, F, f = NULL, s = NULL, ...,
   checkIterArgs(gradtol, steptol, iterlim);
 
   Q <- partial(Q, ...);
-  if(is.function(F)) F <- partial(F, ...);
+  F <- partial(F, ...);
 
 
   #Compute the HDR
@@ -221,3 +221,53 @@ discrete.unimodal <- function(cover.prob, Q, F, f = NULL, s = NULL, ...,
                                    sprintf(100*(1-(1-cover.prob)), fmt = '%#.2f'), '%'))
 
   HDR; }
+
+
+discrete <- function(cover.prob, Q, f, ...) {
+
+    # Capture distribution params
+    Q <- partial(Q, ...);
+    f <- partial(f, ...);  
+    
+    #Compute the HDR
+    alpha <- 0.5*(1-cover.prob);
+    S     <- 0L;
+    PCUT  <- 0L;
+    while (S <= 1-PCUT) {
+      MIN <- Q(alpha/2);
+      MAX <- Q(1- alpha/2);
+      VALS <- seq(from = MIN, to = MAX);
+      PVEC <- f(VALS);
+      S    <- sum(PVEC);
+      if (S < cover.prob)  {
+        PCUT <- 0L; } else {
+          SORT <- sort(PVEC, decreasing = TRUE);
+          NN   <- 0L;
+          PP   <- 0L;
+          while (PP < cover.prob) {
+            NN   <- NN+1;
+            PCUT <- SORT[NN];
+            PP   <- PP+PCUT; } }
+      alpha <- 0.5*alpha; }
+    HDRVALS <- sort((MIN-1) + order(PVEC, decreasing = TRUE)[1:NN],
+                    decreasing = FALSE);
+    if (NN == (max(HDRVALS)-min(HDRVALS)+1)) {
+      HDR <- sets::as.interval(HDRVALS); } else {
+        HDR <- sets::as.set(HDRVALS); }
+    attr(HDR, 'probability') <- PP; 
+  
+  #Add method attribute
+  attr(HDR, 'method') <- paste0('Computed using discrete optimisation with minimum coverage probability = ', sprintf(100*cover.prob, fmt = '%#.2f'), '%');
+  
+  #Add class and attributes
+  class(HDR) <- c('hdr', class(HDR));
+
+  HDR; }
+
+
+
+
+
+
+
+
