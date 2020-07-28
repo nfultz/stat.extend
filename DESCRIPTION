@@ -15,7 +15,7 @@ Description: Highest Density Regions are the smallest set in
     optimal (i.e., shortest) confidence intervals for some basic inferential
     problems, including for population means, variances, or proportion
     parameters.
-License: MIT + file LICENSE
+License: MIT
 Encoding: UTF-8
 LazyData: true
 Imports: 
