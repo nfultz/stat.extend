@@ -3,14 +3,14 @@ Type: Package
 Title: Highest Density Regions, Confidence Intervals with Finite Population
     Corrections, and Other Functions of Probability Distributions
 Version: 0.1.0
-Date: 2020 June 1
 Authors@R: c(
     person("Ben", "O'Neill", email = "ben.oneill@hotmail.com", role = c("aut")),
     person("Neal", "Fultz", email = "nfultz@gmail.com", role = c("cre","ctb"))
     )
+Copyright: Ben O'Neill 2020
 Description: Highest Density Regions are the smallest set in
-    the support of a probability distribution with the with a specified
-    coverage probability. `HDR`s may contain disjoint intervals, but can be calculated
+    the support of a probability distribution with the specified
+    coverage probability. 'HDR's may contain disjoint intervals, but can be calculated
     efficiently using iterative methods. One can similarly construct 
     optimal (i.e., shortest) confidence intervals for some basic inferential
     problems, including for population means, variances, or proportion
