@@ -1,10 +1,9 @@
 Package: stat.extend
 Type: Package
-Title: Highest Density Regions, Confidence Intervals with Finite Population
-    Corrections, and Other Functions of Probability Distributions
-Version: 0.1.0
+Title: Highest Density Regions and Other Functions of Distributions
+Version: 0.1.1
 Authors@R: c(
-    person("Ben", "O'Neill", email = "ben.oneill@hotmail.com", role = c("aut")),
+    person("Ben", "O'Neill", email = "ben.oneill@hotmail.com", role = c("aut", "cph")),
     person("Neal", "Fultz", email = "nfultz@gmail.com", role = c("cre","ctb"))
     )
 Copyright: Ben O'Neill 2020
