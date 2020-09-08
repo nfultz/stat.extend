@@ -160,35 +160,6 @@ bimodal <- function(cover.prob, Q, f = NULL, u = NULL, ...,
 
   HDR; }
 
-#' Used to inherit roxygen docs
-#'
-#' @param gradtol Parameter for the nlm optimisation - a positive scalar giving the tolerance at which the scaled gradient is considered close enough to zero to terminate the algorithm (see [\code{nlm} doccumentation](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/nlm.html)).
-#' @param steptol Parameter for the nlm optimisation - a positive scalar providing the minimum allowable relative step length (see [\code{nlm} doccumentation](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/nlm.html)).
-#' @param iterlim Parameter for the nlm optimisation - a positive integer specifying the maximum number of iterations to be performed before the program is terminated (see [\code{nlm} doccumentation](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/nlm.html)).
-#' @keywords internal
-checkIterArgs <- function(gradtol, steptol, iterlim) {
-  if (!is.numeric(gradtol)) { stop('Error: gradtol should be numeric') }
-  if (length(gradtol) != 1) { stop('Error: gradtol should be a single value'); }
-  if (gradtol <= 0)         { stop('Error: gradtol should be positive'); }
-  if (!is.numeric(steptol)) { stop('Error: steptol should be numeric') }
-  if (length(steptol) != 1) { stop('Error: steptol should be a single value'); }
-  if (steptol <= 0)         { stop('Error: steptol should be positive'); }
-  if (!is.numeric(iterlim)) { stop('Error: iterlim should be numeric') }
-  if (length(iterlim) != 1) { stop('Error: iterlim should be a single value'); }
-  if (iterlim <= 0)         { stop('Error: iterlim should be positive'); }
-}
-
-partial <- function(FUN, ...) {
-  args <- list(...);
-  args <- args[names(args) %in% names(formals(FUN))];
-
-  QQ <- function(L) { do.call("FUN", c(list(L), args)); }
-
-  QQ;}
-
-`%||%` <- function(l, r) {if (is.null(l)) r else l}
-
-
 
 discrete.unimodal <- function(cover.prob, Q, F, f = NULL, s = NULL, ...,
                               gradtol = 1e-10, steptol = 1e-10, iterlim = 100) {
@@ -264,8 +235,114 @@ discrete <- function(cover.prob, Q, f, ...) {
 
   HDR; }
 
-
-
+# Version 2 of discrete, more efficient implementation
+discrete2 <- function(cover.prob, f, ..., supp.min = -Inf, supp.max = Inf, E = NULL,
+                         distribution = 'an unspecified input distribution') {
+  
+  #Check inputs
+  if (!is.numeric(supp.min))   { stop('Error: supp.min should be numeric') }
+  if (length(supp.min) != 1)   { stop('Error: supp.min should be a single value'); }
+  if (!is.numeric(supp.max))   { stop('Error: supp.max should be numeric') }
+  if (length(supp.max) != 1)   { stop('Error: supp.max should be a single value'); }
+  supp.min <- ceiling(supp.min);
+  supp.max <- floor(supp.max);
+  if (supp.max < supp.min)       { stop('Error: specified supp.min and supp.max give empty support'); }
+  
+  #############
+  
+  #Compute the HDR in trivial cases where cover.prob is 0 or 1
+  #When cover.prob = 0 the HDR is the empty region
+  if (cover.prob == 0) {
+    HDR <- sets::interval();
+    attr(HDR, 'probability') <- 0; }
+  #When cover.prob = 1 the HDR is the support of the distribution
+  if (cover.prob == 1) {
+    if ((supp.min >  -Inf)&(supp.max <  Inf)) {
+      VAL <- (supp.min:supp.max);
+      for (i in 1:length(VAL)) { if (f(VAL[i]) == 0) { VAL[i] <- NA; } }
+      VAL <- VAL[!is.na(VAL)];
+      HDR <- sets::set(VAL);
+      HDR <- sets::as.interval(HDR);
+      attr(HDR, 'probability') <- 1; } else {
+        MSG <- paste0('Attempting to find the support of discrete distribution ', deparse(substitute(f)),
+                      ' with no finite bound on support given by user \n',
+                      '--- Output region is set to be the full range from supp.min to supp.max \n',
+                      '--- This might not be the smallest HDR for the distribution');
+        warning(MSG);
+        HDR <- sets::set(c(supp.min, supp.max));
+        HDR <- sets::as.interval(HDR);
+        attr(HDR, 'probability') <- 1; } }
+  
+  #############
+  
+  #Compute the HDR in non-trivial cases where 0 < cover.prob < 1
+  #Computation uses the iterative one-at-a-time method
+  
+  if ((cover.prob > 0) & (cover.prob < 1)) {
+    
+    #Set element sequence for distribution (if not specified by user)
+    if (is.null(E)) {
+      #Finite support (take values from left to right)
+      if ((supp.min >  -Inf)&(supp.max <  Inf)) {
+        ELEM <- function(i) { supp.min - 1 + i; } }
+      #Left-bounded support (take values from left to right)
+      if ((supp.min >  -Inf)&(supp.max == Inf)) {
+        ELEM <- function(i) { supp.min - 1 + i; } }
+      #Right-bounded support (take values from right to left)
+      if ((supp.min == -Inf)&(supp.max <  Inf)) {
+        ELEM <- function(i) { supp.max + 1 - i; } }
+      #Unbounded support (take values oscillating out from zero)
+      if ((supp.min == -Inf)&(supp.max == Inf)) {
+        ELEM <- function(i) { ifelse(i%%2 == 1, floor(i/2), -i/2); } } }
+    
+    #Start by computing a minimum covering set
+    #The matrix HHH keeps track of the highest density values
+    INDEX <- 0;
+    PROBS <- 0;
+    while (PROBS < cover.prob) {
+      INDEX <- INDEX + 1;
+      PROBS <- PROBS + f(ELEM(INDEX)); }
+    ELEMS <- rep(0, INDEX);
+    PROBS <- rep(0, INDEX);
+    for (i in 1: INDEX) {
+      ELEMS[i] <- ELEM(i);
+      PROBS[i] <- f(ELEM(i)); }
+    HHH  <- matrix(c(ELEMS[order(PROBS, decreasing = TRUE)], sort(PROBS, decreasing = TRUE)),
+                   byrow = FALSE, ncol = 2);
+    OUTPROB <- 1 - sum(HHH[,2]);
+    LAST <- sum(cumsum(HHH[,2]) < cover.prob) + 1;
+    HHH  <- HHH[1:LAST, ];
+    MINPROB <- min(HHH[,2]);
+    colnames(HHH) <- c('Value', 'Probability');
+    
+    #Iteratively update the matrix HHH until it contains the values in the HDR
+    while (MINPROB < OUTPROB) {
+      INDEX   <- INDEX + 1;
+      NEWPROB <- f(ELEM(INDEX));
+      OUTPROB <- OUTPROB - NEWPROB;
+      if (NEWPROB > MINPROB) {
+        IND <- 1 + sum(NEWPROB <= HHH[,2]);
+        hhh <- matrix(NA, nrow = nrow(HHH)+1, ncol = 2);
+        hhh[IND,  ] <- c(ELEM(INDEX), NEWPROB);
+        hhh[-IND, ] <- HHH;
+        LAST <- sum(cumsum(hhh[,2]) < cover.prob) + 1;
+        hhh  <- hhh[1:LAST, ];
+        colnames(HHH) <- c('Value', 'Probability');
+        HHH <- hhh;
+        MINPROB <- min(HHH[,2]); } }
+    
+    #Set the HDR
+    HDR <- sets::as.interval(sets::set(HHH[,1]));
+    attr(HDR, 'probability') <- sum(HHH[,2]); }
+  
+  #Add method attribute
+  attr(HDR, 'method') <- paste0('Computed using discrete optimisation with minimum coverage probability = ', sprintf(100*cover.prob, fmt = '%#.2f'), '%');
+  
+  #Add class and attributes
+  class(HDR) <- c('hdr', class(HDR));
+  attr(HDR, 'distribution') <- distribution;
+  
+  HDR; }
 
 
 
