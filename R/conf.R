@@ -1,5 +1,12 @@
 #' Optimal Confidence Intervals for finite populations
 #' 
+#' These functions compute an optimised confidence interval for statistics based on a sample.  The user may enter either a
+#' data vector \code{x} or the sample size \code{n} and the sample statistic.  By default the confidence interval is computed
+#' for an infinite population.  However, the user may enter a population size \code{N} and may use the logical value \code{unsampled} to specify
+#' when the confidence interval is for the variance only of the unsampled part of the population.  This test accounts for the kurtosis, and
+#' so the user must either specify the data vector or specify an assumed kurtosis \code{kurt}; if no kurtosis value is specified then the test
+#' uses the sample kurtosis from the data.
+#' 
 #' The mean interval is built on a symmetric pivotal quantity so it is symmetric around the sample mean.  
 #' 
 #' The variance interval is built on a non-symmetric pivotal quantity, so it is optimised by taking the shortest possible confidence interval with the specified confidence level (see e.g., Tate and Klett 1959).  
@@ -7,16 +14,15 @@
 #' The proportion interval uses the Wilson score interval (see e.g., Agresti and Coull 1998).
 #' 
 #' @param alpha alpha Numeric (probability) The significance level determining the confidence level for the interval (the confidence level is 1-alpha).
-#' @param x  Numeric (vector) The vector of sample data (in the CONF.prop function this must be binary data)
-#' 
-#' @param sample.mean Numeric (any) The sample mean of the data
-#' @param sample.variance Numeric (non-neg) The sample variance of the data
+#' @param x  Numeric (vector) The vector of sample data. In the CONF.prop function this must be binary data. Ignored if a sample statistic is provided.
 #' 
 #' @param unsampled Logical (positive) Indicator of whether the user wants a confidence interval for the relevant parameter only for the unsampled part of the population (as opposed to the whole population)
 #' @param kurt Numeric (positive) The assumed kurtosis of the underlying distribution (must be at least one)
 #' 
 #' @param n Integer (positive) The sample size
 #' @param N Integer (positive) The population size (must be at least as large as the sample size)
+#'
+#' @return an object of class 'ci' providing the confidence interval and related information.
 #'
 #' @inheritParams checkIterArgs 
 #' @examples 
@@ -35,6 +41,7 @@ NULL
 
 
 #'@rdname CONF
+#' @param sample.mean Numeric (any) The sample mean of the data.
 CONF.mean <- function(alpha, x = NULL, sample.mean = mean(x), 
                       sample.variance = var(x), n = length(x),
                       N = Inf, kurt = 3, unsampled = FALSE,
@@ -60,8 +67,7 @@ CONF.mean <- function(alpha, x = NULL, sample.mean = mean(x),
       stop('Error: specify data or n but not both'); }
   
   #Check data inputs
-  if (!is.null(x)) {
-    if (!is.numeric(x))     { stop('Error: x should be numeric') } }
+  if (!is.numeric(x))     { stop('Error: x should be numeric') }
   if (!is.numeric(sample.mean))    { stop('Error: mean should be numeric') }
   if (length(sample.mean) != 1)    { stop('Error: mean should be a single value'); }
   if (!is.numeric(sample.variance)) { stop('Error: variance should be numeric') }
@@ -125,30 +131,8 @@ CONF.mean <- function(alpha, x = NULL, sample.mean = mean(x),
   
   CONF; }
 
-#'@rdname CONF
-#' Confidence interval for the variance of a population
-#'
-#' This function computes the optimised confidence interval for the variance of a population based on a sample.  The user may enter either a
-#' data vector ```x``` or the sample size ``n``` and the sample variance ```sample.variance```.  By default the confidence interval is computed
-#' for an infinite population.  However, the user may enter a population size ```N``` and may use the logical value ```unsampled``` to specify
-#' when the confidence interval is for the variance only of the unsampled part of the population.  This test accounts for the kurtosis, and
-#' so the user must either specify the data vector or specify an assumed kurtosis ```kurt```; if no kurtosis value is specified then the test
-#' uses the sample kurtosis from the data.  The output is an object of class 'ci' giving the confidence interval and related information.
-#'
-#' @usage \code{CONF.var(alpha, x = NULL, sample.variance = var(x), n = length(x), N = Inf, kurt = NULL, unsampled = FALSE,
-#' gradtol = 1e-10, steptol = 1e-10, iterlim = 100)}
-#' @param x A data vector
-#' @param sample.variance The sample variance (only specify this if data ```x``` is not included)
-#' @param n The sample size (only specify this if data ```x``` is not included)
-#' @param N The population size
-#' @param kurt The assumed kurtosis for the test; if unspecified, the kurtosis is estimated from the data vector ```x```.
-#' @param unsampled Logical value; if ```TRUE``` the confidence interval is for the variance of the unsampled population
-#' @param gradtol Parameter for the nlm optimisation - a positive scalar giving the tolerance at which the scaled gradient is considered close enough to zero to terminate the algorithm (see [\code{nlm} doccumentation](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/nlm.html)).
-#' @param steptol Parameter for the nlm optimisation - a positive scalar providing the minimum allowable relative step length (see [\code{nlm} doccumentation](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/nlm.html)).
-#' @param iterlim Parameter for the nlm optimisation - a positive integer specifying the maximum number of iterations to be performed before the program is terminated (see [\code{nlm} doccumentation](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/nlm.html)).
-#' @return If all inputs are correctly specified (i.e., arguments and parameters are in allowable range)
-#' then the output will be a list of class \code{ci} containing the confidence interval and related information.
-
+#' @rdname CONF
+#' @param sample.variance Numeric (non-neg) The sample variance of the data.
 CONF.var <- function(alpha, x = NULL,
                      sample.variance = var(x), n = length(x),
                      N = Inf, kurt = NULL, unsampled = FALSE,
@@ -170,8 +154,7 @@ CONF.var <- function(alpha, x = NULL,
       stop('Error: specify data or n but not both'); }
   
   #Check data inputs
-  if (!is.null(x)) {
-    if (!is.numeric(x))     { stop('Error: x should be numeric') } }
+  if (!is.numeric(x))     { stop('Error: x should be numeric') }
   if (!is.numeric(sample.variance)) { stop('Error: variance should be numeric') }
   if (length(sample.variance) != 1) { stop('Error: variance should be a single value'); }
   if (sample.variance < 0)          { stop('Error: variance is negative'); }

@@ -368,7 +368,7 @@ is done by optimisation using the \code{nlm} function.
   HDR.gompertz\tab shape    \tab scale  \tab       \cr
   HDR.gpd     \tab mu,location\tab sigma, scale\tab shape, xi\cr
   HDR.huber   \tab mu       \tab sigma  \tab epsilon \cr
-  HDR.kumar   \tab a,shape2 \tab b,shape2 \tab     \cr
+  HDR.kumar   \tab a,shape1 \tab b,shape2 \tab     \cr
   HDR.tnorm   \tab mean     \tab sd     \tab a, b, min, max \cr
    \tab     \tab   \tab       \cr
   Using \code{invgamma} \tab \tab       \tab       \cr
@@ -379,7 +379,7 @@ is done by optimisation using the \code{nlm} function.
   Using \code{VGAM} \tab    \tab        \tab       \cr
   HDR.benini  \tab shape    \tab y0     \tab scale \cr
   HDR.frechet \tab shape    \tab scale  \tab location\cr
-  HDR.gengamma\tab  d, shape1 \tab, k, shape2 \tab rate, scale \cr
+  HDR.gengamma\tab  d, shape1 \tab k, shape2 \tab rate, scale \cr
   HDR.gumbelII\tab shape    \tab scale  \tab       \cr
   HDR.lgamma  \tab shape    \tab scale  \tab location\cr
   }

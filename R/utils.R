@@ -97,6 +97,14 @@ reformat <- function(OBJ) {
   
   OUT; }
 
+#' @export
+#' @rdname reformat
+#' @param an R object
+as.data.frame.hdr <- function(x, ...) reformat(x)
+
+#' @export
+#' @rdname reformat
+as.data.frame.ci <- function(x, ...) reformat(x)
 
 #' Used to inherit roxygen docs
 #'
