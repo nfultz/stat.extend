@@ -247,7 +247,11 @@ discrete2 <- function(cover.prob, f, ..., supp.min = -Inf, supp.max = Inf, E = N
   supp.min <- ceiling(supp.min);
   supp.max <- floor(supp.max);
   if (supp.max < supp.min)       { stop('Error: specified supp.min and supp.max give empty support'); }
+
+  # Capture distribution params
+  f <- partial(f, ...);  
   
+    
   #############
   
   #Compute the HDR in trivial cases where cover.prob is 0 or 1

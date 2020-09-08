@@ -16,7 +16,7 @@ stopifnot(all.equal(
 
 
 stopifnot(all.equal(
-  stat.extend::HDR.discrete(.95, Q=qpois, f=dpois, lambda=1)[1:2],
+  stat.extend::HDR.discrete(.95, f=dpois, lambda=1)[1:2],
   stat.extend::HDR.pois(.95, 1)[1:2]
 ))
 
