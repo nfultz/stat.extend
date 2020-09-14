@@ -194,49 +194,8 @@ discrete.unimodal <- function(cover.prob, Q, F, f = NULL, s = NULL, ...,
   HDR; }
 
 
-discrete <- function(cover.prob, Q, f, ...) {
 
-    # Capture distribution params
-    Q <- partial(Q, ...);
-    f <- partial(f, ...);  
-    
-    #Compute the HDR
-    alpha <- 0.5*(1-cover.prob);
-    S     <- 0L;
-    PCUT  <- 0L;
-    while (S <= 1-PCUT) {
-      MIN <- Q(alpha/2);
-      MAX <- Q(1- alpha/2);
-      VALS <- seq(from = MIN, to = MAX);
-      PVEC <- f(VALS);
-      S    <- sum(PVEC);
-      if (S < cover.prob)  {
-        PCUT <- 0L; } else {
-          SORT <- sort(PVEC, decreasing = TRUE);
-          NN   <- 0L;
-          PP   <- 0L;
-          while (PP < cover.prob) {
-            NN   <- NN+1;
-            PCUT <- SORT[NN];
-            PP   <- PP+PCUT; } }
-      alpha <- 0.5*alpha; }
-    HDRVALS <- sort((MIN-1) + order(PVEC, decreasing = TRUE)[1:NN],
-                    decreasing = FALSE);
-    if (NN == (max(HDRVALS)-min(HDRVALS)+1)) {
-      HDR <- sets::as.interval(HDRVALS); } else {
-        HDR <- sets::as.set(HDRVALS); }
-    attr(HDR, 'probability') <- PP; 
-  
-  #Add method attribute
-  attr(HDR, 'method') <- paste0('Computed using discrete optimisation with minimum coverage probability = ', sprintf(100*cover.prob, fmt = '%#.2f'), '%');
-  
-  #Add class and attributes
-  class(HDR) <- c('hdr', class(HDR));
-
-  HDR; }
-
-# Version 2 of discrete, more efficient implementation
-discrete2 <- function(cover.prob, f, ..., supp.min = -Inf, supp.max = Inf, E = NULL,
+discrete <- function(cover.prob, Q=NULL, f, supp.min = -Inf, supp.max = Inf, E = NULL, ...,
                          distribution = 'an unspecified input distribution') {
   
   #Check inputs
@@ -244,38 +203,44 @@ discrete2 <- function(cover.prob, f, ..., supp.min = -Inf, supp.max = Inf, E = N
   if (length(supp.min) != 1)   { stop('Error: supp.min should be a single value'); }
   if (!is.numeric(supp.max))   { stop('Error: supp.max should be numeric') }
   if (length(supp.max) != 1)   { stop('Error: supp.max should be a single value'); }
-  supp.min <- ceiling(supp.min);
-  supp.max <- floor(supp.max);
+  supp.min <- floor(supp.min);
+  supp.max <- ceiling(supp.max);
   if (supp.max < supp.min)       { stop('Error: specified supp.min and supp.max give empty support'); }
-
-  # Capture distribution params
-  f <- partial(f, ...);  
   
-    
+  f <- partial(f, ...);
+  
+  
   #############
   
-  #Compute the HDR in trivial cases where cover.prob is 0 or 1
-  #When cover.prob = 0 the HDR is the empty region
-  if (cover.prob == 0) {
-    HDR <- sets::interval();
-    attr(HDR, 'probability') <- 0; }
   #When cover.prob = 1 the HDR is the support of the distribution
-  if (cover.prob == 1) {
+  # This is custom logic for the discrete HDR case; normally handed by hdr()
+  if (cover.prob > 1 - .Machine$double.eps) {
     if ((supp.min >  -Inf)&(supp.max <  Inf)) {
       VAL <- (supp.min:supp.max);
       for (i in 1:length(VAL)) { if (f(VAL[i]) == 0) { VAL[i] <- NA; } }
       VAL <- VAL[!is.na(VAL)];
       HDR <- sets::set(VAL);
       HDR <- sets::as.interval(HDR);
-      attr(HDR, 'probability') <- 1; } else {
+      attr(HDR, 'probability') <- 1; 
+      } else {
         MSG <- paste0('Attempting to find the support of discrete distribution ', deparse(substitute(f)),
                       ' with no finite bound on support given by user \n',
                       '--- Output region is set to be the full range from supp.min to supp.max \n',
-                      '--- This might not be the smallest HDR for the distribution');
+                      '--- This might not be the HDR for the distribution');
         warning(MSG);
         HDR <- sets::set(c(supp.min, supp.max));
         HDR <- sets::as.interval(HDR);
-        attr(HDR, 'probability') <- 1; } }
+        attr(HDR, 'probability') <- 1; } 
+
+    #Add method attribute
+    attr(HDR, 'method') <- paste0('Computed using discrete optimisation with minimum coverage probability = ', sprintf(100*cover.prob, fmt = '%#.2f'), '%');
+    
+    #Add class and attributes
+    class(HDR) <- c('hdr', class(HDR));
+    attr(HDR, 'distribution') <- distribution;
+    
+    return(HDR);
+  }
   
   #############
   
@@ -297,47 +262,89 @@ discrete2 <- function(cover.prob, f, ..., supp.min = -Inf, supp.max = Inf, E = N
         ELEM <- function(i) { supp.max + 1 - i; } }
       #Unbounded support (take values oscillating out from zero)
       if ((supp.min == -Inf)&(supp.max == Inf)) {
-        ELEM <- function(i) { ifelse(i%%2 == 1, floor(i/2), -i/2); } } }
+        ELEM <- function(i) { ifelse(i%%2 == 1, floor(i/2), -i/2); } } } else { ELEM <- E }
     
     #Start by computing a minimum covering set
-    #The matrix HHH keeps track of the highest density values
+    #The complex vector HHH keeps track of the highest density values and their elements
     INDEX <- 0;
-    PROBS <- 0;
-    while (PROBS < cover.prob) {
-      INDEX <- INDEX + 1;
-      PROBS <- PROBS + f(ELEM(INDEX)); }
-    ELEMS <- rep(0, INDEX);
-    PROBS <- rep(0, INDEX);
-    for (i in 1: INDEX) {
-      ELEMS[i] <- ELEM(i);
-      PROBS[i] <- f(ELEM(i)); }
-    HHH  <- matrix(c(ELEMS[order(PROBS, decreasing = TRUE)], sort(PROBS, decreasing = TRUE)),
-                   byrow = FALSE, ncol = 2);
-    OUTPROB <- 1 - sum(HHH[,2]);
-    LAST <- sum(cumsum(HHH[,2]) < cover.prob) + 1;
-    HHH  <- HHH[1:LAST, ];
-    MINPROB <- min(HHH[,2]);
-    colnames(HHH) <- c('Value', 'Probability');
+    PROB  <- 0;
     
-    #Iteratively update the matrix HHH until it contains the values in the HDR
-    while (MINPROB < OUTPROB) {
+    HHH <- rep(NA_complex_, 1024) # preallocating to avoid multiple resizes
+    
+    while(PROB < cover.prob) {
+      INDEX <- INDEX + 1;
+      
+      if(INDEX >= length(HHH)) length(HHH) <- 2*length(HHH)
+      
+      item <- ELEM(INDEX);
+      prob <- f(item);
+      
+      HHH[INDEX] <- prob + item*1i 
+      
+      PROB <- PROB + prob
+      
+    }
+    
+    # sorts all *and* removes any NAs
+    HHH <- sort(HHH)
+
+    OUTPROB <- 1 - PROB;
+        
+    repeat {
+      MININDEX <- 1;
+      MINPROB <- Re(HHH)[MININDEX]
+      
+      
+      # Trim if needed
+      while(PROB - MINPROB >= cover.prob) {
+        # Mark as erased, advance to next
+        # HHH[MIN_INDEX] <- NA_complex_ # only needed for debugging
+        PROB <- PROB - MINPROB
+        MININDEX <- MININDEX + 1;
+        MINPROB <- Re(HHH)[MININDEX]
+      } 
+      
+      if(MININDEX > 1) {
+        HHH <- HHH[MININDEX:length(HHH)]
+      }
+      
+      if(MINPROB > OUTPROB) break;
+      
+      
       INDEX   <- INDEX + 1;
-      NEWPROB <- f(ELEM(INDEX));
+      
+      NEWELEM <- ELEM(INDEX);
+      NEWPROB <- f(NEWELEM);
+      
       OUTPROB <- OUTPROB - NEWPROB;
+      
       if (NEWPROB > MINPROB) {
-        IND <- 1 + sum(NEWPROB <= HHH[,2]);
-        hhh <- matrix(NA, nrow = nrow(HHH)+1, ncol = 2);
-        hhh[IND,  ] <- c(ELEM(INDEX), NEWPROB);
-        hhh[-IND, ] <- HHH;
-        LAST <- sum(cumsum(hhh[,2]) < cover.prob) + 1;
-        hhh  <- hhh[1:LAST, ];
-        colnames(HHH) <- c('Value', 'Probability');
-        HHH <- hhh;
-        MINPROB <- min(HHH[,2]); } }
+        # Replace old minima with new element
+        PROB <- PROB - MINPROB + NEWPROB
+      
+        
+        if(NEWPROB < Re(HHH)[2]) {
+          # NEWPROB maintains sorting; easy case
+          HHH[1] <- NEWPROB + 1i*NEWELEM
+        }
+        else {
+          # Re-sort the array if new prob broke the sorting.
+          # Because it's already sorted except for 1st element, rotate the front elements back to make space
+          # eg new = 5, old = 1 2 3 6 8 =>  2 3 5 6 8
+          
+          INSERTINDEX <- findInterval(NEWPROB, Re(HHH))
+          # stopifnot(INSERTINDEX > 1)
+          HHH[seq(1, INSERTINDEX - 1)] <- HHH[seq(2, INSERTINDEX)]
+          HHH[INSERTINDEX] <- NEWPROB + 1i*NEWELEM
+        }
+      }
+      
+    }
+    
     
     #Set the HDR
-    HDR <- sets::as.interval(sets::set(HHH[,1]));
-    attr(HDR, 'probability') <- sum(HHH[,2]); }
+    HDR <- sets::as.interval(sets::set(Im(HHH)));
+    attr(HDR, 'probability') <- PROB; }
   
   #Add method attribute
   attr(HDR, 'method') <- paste0('Computed using discrete optimisation with minimum coverage probability = ', sprintf(100*cover.prob, fmt = '%#.2f'), '%');
@@ -347,7 +354,6 @@ discrete2 <- function(cover.prob, f, ..., supp.min = -Inf, supp.max = Inf, E = N
   attr(HDR, 'distribution') <- distribution;
   
   HDR; }
-
 
 
 
