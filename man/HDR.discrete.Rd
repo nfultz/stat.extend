@@ -25,10 +25,13 @@ then the output will be a list of class ```hdr``` containing the HDR and related
 }
 \description{
 This function computes the highest density region (HDR) with support on the integers.  The distribution can be any discrete
-distribution concentrated on the integers --- it does not have to have any shape properties for the function to work.  The user
-must give the density function ```f``` for the distribution.  To improve the search properties of the algorithm, the user can
+distribution concentrated on the integers --- it does not have to have any shape properties for the function to work.
+}
+\details{
+The user must give the density function ```f``` for the distribution.  To improve the search properties of the algorithm, they can
 also give lower and upper bounds for the support of the distribution if these are available.  (Warning: If the user specifies
 incorrect bounds on the support, that do not contain the full support of the distribution, then the algorithm may continue to
-search without end, in which case the function will not terminate.)  The output of the function is a \code{'hdr'} object
-containing the HDR for the discrete distribution.
+search without end, in which case the function will not terminate.  Similarly, if the user specifies a sequence function E that
+is not a proper bijection to the integers then the algorithm may continue to search without end, in which case the function will
+not terminate.) The output of the function is a \code{'hdr'} object containing the HDR for the discrete distribution.
 }
