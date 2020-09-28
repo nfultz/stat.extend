@@ -6,7 +6,7 @@
 \alias{as.data.frame.ci}
 \title{Reformat HDRs and confidence intervals objects}
 \usage{
-\code{reformat(OBJ)}
+reformat(OBJ)
 
 \method{as.data.frame}{hdr}(x, ...)
 
@@ -15,7 +15,9 @@
 \arguments{
 \item{OBJ}{An object to reformat (either a HDR or a confidence interval)}
 
-\item{an}{R object}
+\item{x}{an R object}
+
+\item{...}{unused}
 }
 \value{
 Returns the reformatted object
