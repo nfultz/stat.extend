@@ -6,7 +6,6 @@
 #' and *vice versa*.  All attributes and information is preserved when changing formats.  If the object is not of a recognised kind (or is
 #' of multiple recognised kinds) then it is returned unchanged and the function gives a warning.
 #'
-#' @usage \code{reformat(OBJ)}
 #' @param OBJ An object to reformat (either a HDR or a confidence interval)
 #' @return Returns the reformatted object
 
@@ -99,7 +98,8 @@ reformat <- function(OBJ) {
 
 #' @export
 #' @rdname reformat
-#' @param an R object
+#' @param x an R object
+#' @param ... unused
 as.data.frame.hdr <- function(x, ...) reformat(x)
 
 #' @export
