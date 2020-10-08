@@ -1,3 +1,8 @@
+## Cran Notes 2020 Oct 8
+
+This release is primarily to update documentation. There are some performance improvements as well, especially
+for searching for discrete HDR. 
+
 ## Cran Notes 2020 Aug 5
 
 ```
